@@ -1,5 +1,7 @@
 # Built files
-src/proto
+/src/proto/**/*.ts
+/src/proto/**/*.js
+/src/types/schema/**/*.ts
 docs/
 esm/
 lib/
@@ -175,3 +177,5 @@ Icon
 Network Trash Folder
 Temporary Items
 .apdisk
+
+wallet-utils-*.tgz
