@@ -4,6 +4,9 @@
   "description": "Typescript Utilities for Provenance Blockchain Wallet",
   "main": "lib/index.js",
   "module": "esm/index.js",
+  "publishConfig": {
+    "access": "public"
+  },
   "private": false,
   "sideEffects": false,
   "files": [
