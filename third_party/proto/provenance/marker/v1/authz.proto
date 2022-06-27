@@ -12,9 +12,9 @@ option java_multiple_files = true;
 // MarkerTransferAuthorization gives the grantee permissions to execute
 // a marker transfer on behalf of the granter's account.
 message MarkerTransferAuthorization {
-    option (cosmos_proto.implements_interface) = "Authorization";
+  option (cosmos_proto.implements_interface) = "Authorization";
 
-    // transfer_limit is the total amount the grantee can transfer
-    repeated cosmos.base.v1beta1.Coin transfer_limit = 1
-    [(gogoproto.nullable) = false, (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins"];
+  // transfer_limit is the total amount the grantee can transfer
+  repeated cosmos.base.v1beta1.Coin transfer_limit = 1
+      [(gogoproto.nullable) = false, (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins"];
 }

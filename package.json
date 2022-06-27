@@ -21,8 +21,9 @@
     "build:protos": "bash ./scripts/build_protos.sh",
     "build:schemas": "json2ts -i third_party/schema -o src/types/schema/",
     "clean": "rm -rf ./lib ./esm",
-    "commit": "cz",
+    "commit": "npx cz",
     "postbuild": "node ./scripts/checkCircularDeps.js",
+    "pull:protos": "bash ./scripts/pull_protos.sh",
     "prepare": "npm run build && husky install",
     "test": "",
     "tsc:esm": "tsc --module es2015 --outDir esm",
@@ -62,7 +63,10 @@
     "@babel/preset-typescript": "^7.17.12",
     "@commitlint/cli": "^17.0.0",
     "@commitlint/config-conventional": "^17.0.0",
+    "@grpc/grpc-js": "^1.6.7",
+    "@types/create-hash": "^1.2.2",
     "@types/google-protobuf": "3.15.6",
+    "@types/secp256k1": "^4.0.3",
     "babel-loader": "^8.2.5",
     "chalk": "^4.1.2",
     "commitizen": "^1.0.4",
@@ -71,14 +75,13 @@
     "eslint": "^8.15.0",
     "eslint-config-prettier": "^8.5.0",
     "eslint-plugin-prettier": "^4.0.0",
-    "grpc_tools_node_protoc_ts": "5.3.2",
+    "grpc_tools_node_protoc_ts": "^5.3.2",
     "husky": "^8.0.1",
     "json-schema-to-typescript": "10.1.5",
     "lint-staged": "^12.4.1",
     "madge": "^5.0.1",
     "prettier": "^2.6.2",
     "protoc-gen-grpc-web": "1.4.0",
-    "protoc-gen-ts": "0.8.2",
     "semantic-release": "^19.0.2",
     "typedoc": "^0.22.15",
     "typescript": "^4.6.4"
@@ -105,10 +108,15 @@
     ]
   },
   "dependencies": {
-    "@tendermint/belt": "^0.3.0"
+    "@tendermint/belt": "0.3.0",
+    "@tendermint/sig": "0.6.0",
+    "grpc-web": "1.2.0",
+    "secp256k1": "4.0.3"
   },
   "release": {
-    "branches": ["main"]
+    "branches": [
+      "main"
+    ]
   },
   "config": {
     "commitizen": {

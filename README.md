@@ -28,10 +28,10 @@ npm install @provenanceio/wallet-utils --save
 
 > The package json import will look like this: "@provenanceio/wallet-utils": "^0.2.0"
 
-Below is a quick example of how to use a GUI item in a component:
+Below is a quick example of how to use the utils to prepare a message:
 
 ```js
-import { buildMessage } from "@provenanceio/wallet-utils";
+import { buildMessage, createAnyMessageBase64 } from "@provenanceio/wallet-utils";
 
 const type = 'MsgDelegate';
 const sendMessage = {
