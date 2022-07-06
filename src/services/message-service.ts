@@ -1,7 +1,9 @@
 import * as google_protobuf_any_pb from 'google-protobuf/google/protobuf/any_pb';
 import { Message } from 'google-protobuf';
 import type { Bytes } from '@tendermint/types';
-import { base64ToBytes, bytesToBase64 } from '@tendermint/belt';
+import { base64ToBytes, bufferToBytes, bytesToBase64 } from '@tendermint/belt';
+import { createHash } from 'crypto';
+import { ecdsaSign as secp256k1EcdsaSign } from 'secp256k1';
 import {
   MsgBeginRedelegateDisplay,
   MsgCreateValidatorDisplay,
@@ -92,6 +94,33 @@ export const buildTxBody = (
   return txBody;
 };
 
+export const buildSignDoc = (
+  accNumber: number,
+  chainId: string,
+  txRaw: TxRaw
+): SignDoc => {
+  const signDoc = new SignDoc();
+  signDoc.setAccountNumber(accNumber);
+  signDoc.setAuthInfoBytes(txRaw.getAuthInfoBytes());
+  signDoc.setChainId(chainId);
+  signDoc.setBodyBytes(txRaw.getBodyBytes());
+  return signDoc;
+};
+
+export const sha256 = (bytes: Bytes): Bytes => {
+  const buffer1 = bytes instanceof Buffer ? bytes : Buffer.from(bytes);
+  const buffer2 = createHash('sha256').update(buffer1).digest();
+
+  return bufferToBytes(buffer2);
+};
+
+export const signBytes = (bytes: Uint8Array, privateKey: Bytes): Uint8Array => {
+  const hash = sha256(bytes);
+  const { signature } = secp256k1EcdsaSign(hash, privateKey);
+
+  return signature;
+};
+
 export const buildCalculateTxFeeRequest = (
   msgAny: google_protobuf_any_pb.Any | google_protobuf_any_pb.Any[],
   account: BaseAccount,
@@ -106,7 +135,7 @@ export const buildCalculateTxFeeRequest = (
   const txRaw = new TxRaw();
   txRaw.setBodyBytes(txBody.serializeBinary());
   txRaw.setAuthInfoBytes(authInfo.serializeBinary());
-  txRaw.setSignaturesList([]);
+  txRaw.setSignaturesList(['']);
 
   const calculateTxFeeRequest = new CalculateTxFeesRequest();
   calculateTxFeeRequest.setTxBytes(txRaw.serializeBinary());
