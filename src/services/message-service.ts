@@ -1,5 +1,6 @@
 import * as google_protobuf_any_pb from 'google-protobuf/google/protobuf/any_pb';
 import { Message } from 'google-protobuf';
+import type { Wallet } from '@tendermint/sig';
 import type { Bytes } from '@tendermint/types';
 import { base64ToBytes, bufferToBytes, bytesToBase64 } from '@tendermint/belt';
 import { createHash } from 'crypto';
@@ -45,6 +46,7 @@ import {
 } from '../proto/cosmos/tx/v1beta1/tx_pb';
 import { CalculateTxFeesRequest } from '../proto/provenance/msgfees/v1/query_pb';
 import { SignMode } from '../proto/cosmos/tx/signing/v1beta1/signing_pb';
+import { BroadcastMode, BroadcastTxRequest } from '../proto/cosmos/tx/v1beta1/service_pb';
 
 export const buildAuthInfo = (
   signerInfo: SignerInfo,
@@ -121,14 +123,23 @@ export const signBytes = (bytes: Uint8Array, privateKey: Bytes): Uint8Array => {
   return signature;
 };
 
-export const buildCalculateTxFeeRequest = (
+interface CalculateTxFeesRequestParams {
   msgAny: google_protobuf_any_pb.Any | google_protobuf_any_pb.Any[],
   account: BaseAccount,
   publicKey: Bytes,
-  gasPriceDenom: SupportedDenoms = 'nhash',
+  gasPriceDenom?: SupportedDenoms,
   gasPrice: number,
-  gasAdjustment = 1.25
-): CalculateTxFeesRequest => {
+  gasAdjustment?: number,
+}
+
+export const buildCalculateTxFeeRequest = ({
+  msgAny,
+  account,
+  publicKey,
+  gasPriceDenom = 'nhash',
+  gasPrice,
+  gasAdjustment = 1.25,
+}: CalculateTxFeesRequestParams): CalculateTxFeesRequest => {
   const signerInfo = buildSignerInfo(account, publicKey);
   const authInfo = buildAuthInfo(signerInfo, gasPriceDenom, undefined, gasPrice);
   const txBody = buildTxBody(msgAny);
@@ -209,3 +220,41 @@ export const createAnyMessageBase64 = (
 export const msgAnyB64toAny = (msgAnyB64: string): google_protobuf_any_pb.Any => {
   return google_protobuf_any_pb.Any.deserializeBinary(base64ToBytes(msgAnyB64));
 };
+
+interface buildBroadcastTxRequestProps {
+  msgAny: google_protobuf_any_pb.Any | google_protobuf_any_pb.Any[],
+  account: BaseAccount,
+  chainId: string,
+  wallet: Wallet,
+  feeEstimate: number,
+  memo: string,
+  feeDenom: SupportedDenoms,
+  gasEstimate: number,
+};
+
+export const buildBroadcastTxRequest = ({
+  msgAny,
+  account,
+  chainId,
+  wallet,
+  feeEstimate,
+  memo = '',
+  feeDenom = 'nhash',
+  gasEstimate,
+}: buildBroadcastTxRequestProps): BroadcastTxRequest => {
+  console.log(`Building tx request for broadcast`);
+  const signerInfo = buildSignerInfo(account, wallet.publicKey);
+  const authInfo = buildAuthInfo(signerInfo, feeDenom, feeEstimate, gasEstimate);
+  const txBody = buildTxBody(msgAny, memo);
+  const txRaw = new TxRaw();
+  txRaw.setBodyBytes(txBody.serializeBinary());
+  txRaw.setAuthInfoBytes(authInfo.serializeBinary());
+  const signDoc = buildSignDoc(account.getAccountNumber(), chainId, txRaw);
+  const signature = signBytes(signDoc.serializeBinary(), wallet.privateKey);
+  // const verified = chainService.verifyTx(signDocBinary, bytesToBase64(wallet.publicKey), signature);
+  txRaw.setSignaturesList([signature]);
+  const txRequest = new BroadcastTxRequest();
+  txRequest.setTxBytes(txRaw.serializeBinary());
+  txRequest.setMode(BroadcastMode.BROADCAST_MODE_SYNC);
+  return txRequest;
+}
