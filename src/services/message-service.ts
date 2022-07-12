@@ -3,9 +3,12 @@ import { Message } from 'google-protobuf';
 import type { Wallet } from '@tendermint/sig';
 import type { Bytes } from '@tendermint/types';
 import { base64ToBytes, bufferToBytes, bytesToBase64 } from '@tendermint/belt';
+import { MsgExecuteContract } from '../proto/cosmwasm/wasm/v1/tx_pb';
 import { createHash } from 'crypto';
 import { ecdsaSign as secp256k1EcdsaSign } from 'secp256k1';
 import {
+  MESSAGE_PROTOS,
+  CoinAsObject,
   MsgBeginRedelegateDisplay,
   MsgCreateValidatorDisplay,
   MsgCreateVestingAccountDisplay,
@@ -29,6 +32,7 @@ import {
   ReadableMessageNames,
   TYPE_NAMES_READABLE_MAP,
   SupportedDenoms,
+  SupportedMessageTypeNames,
 } from '../types';
 import { BaseAccount } from '../proto/cosmos/auth/v1beta1/auth_pb';
 import { Coin } from '../proto/cosmos/base/v1beta1/coin_pb';
@@ -47,6 +51,16 @@ import {
 import { CalculateTxFeesRequest } from '../proto/provenance/msgfees/v1/query_pb';
 import { SignMode } from '../proto/cosmos/tx/signing/v1beta1/signing_pb';
 import { BroadcastMode, BroadcastTxRequest } from '../proto/cosmos/tx/v1beta1/service_pb';
+
+export type GenericDisplay = { [key: string]: any };
+
+export type MsgExecuteContractDisplay = {
+  sender: string;
+  msg: any;
+  fundsList: CoinAsObject[];
+};
+
+export type FallbackGenericMessageName = 'MsgGeneric' | 'MsgExecuteContractGeneric';
 
 export const buildAuthInfo = (
   signerInfo: SignerInfo,
@@ -257,4 +271,39 @@ export const buildBroadcastTxRequest = ({
   txRequest.setTxBytes(txRaw.serializeBinary());
   txRequest.setMode(BroadcastMode.BROADCAST_MODE_SYNC);
   return txRequest;
+}
+
+export const unpackDisplayObjectFromWalletMessage = (anyMsgBase64: string): (MsgSendDisplay | MsgExecuteContractDisplay | GenericDisplay) & {
+  typeName: ReadableMessageNames | FallbackGenericMessageName;
+} => {
+  const decoder = new TextDecoder('utf-8');
+  const msgBytes = base64ToBytes(anyMsgBase64);
+  const msgAny = google_protobuf_any_pb.Any.deserializeBinary(msgBytes);
+  const typeName = msgAny.getTypeName() as SupportedMessageTypeNames;
+  if (MESSAGE_PROTOS[typeName]) {
+    const message = msgAny.unpack(MESSAGE_PROTOS[typeName].deserializeBinary, typeName);
+    switch (typeName) {
+      case 'cosmos.bank.v1beta1.MsgSend':
+        return {
+          typeName: 'MsgSend',
+          ...(message as MsgSend).toObject(),
+        };
+      case 'cosmwasm.wasm.v1.MsgExecuteContract':
+        return {
+          typeName: 'MsgExecuteContractGeneric',
+          sender: (message as MsgExecuteContract).getSender(),
+          msg: JSON.parse(decoder.decode((message as MsgExecuteContract).getMsg() as Uint8Array)),
+          fundsList: (message as MsgExecuteContract).getFundsList().map((coin) => ({
+            denom: coin.getDenom(),
+            amount: Number(coin.getAmount()),
+          })),
+        };
+      default:
+        return {
+          typeName: 'MsgGeneric',
+          ...(message as Message).toObject(),
+        };
+    }
+  }
+  throw new Error(`Message type: ${typeName} is not supported for display.`);
 }

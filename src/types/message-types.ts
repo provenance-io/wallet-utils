@@ -1,6 +1,53 @@
-import type { MsgSend } from '../proto/cosmos/bank/v1beta1/tx_pb';
-import type { MsgVerifyInvariant } from '../proto/cosmos/crisis/v1beta1/tx_pb';
-import type {
+import { MsgSend } from '../proto/cosmos/bank/v1beta1/tx_pb';
+import { MsgVerifyInvariant } from '../proto/cosmos/crisis/v1beta1/tx_pb';
+import { Message } from 'google-protobuf';
+import { MarkerTransferAuthorization } from '../proto/provenance/marker/v1/authz_pb';
+import { MsgBindNameRequest, MsgDeleteNameRequest } from '../proto/provenance/name/v1/tx_pb';
+import {
+  MsgAddContractSpecToScopeSpecRequest,
+  MsgAddScopeDataAccessRequest,
+  MsgAddScopeOwnerRequest,
+  MsgBindOSLocatorRequest,
+  MsgDeleteContractSpecFromScopeSpecRequest,
+  MsgDeleteContractSpecificationRequest,
+  MsgDeleteOSLocatorRequest,
+  MsgDeleteRecordRequest,
+  MsgDeleteRecordSpecificationRequest,
+  MsgDeleteScopeDataAccessRequest,
+  MsgDeleteScopeOwnerRequest,
+  MsgDeleteScopeRequest,
+  MsgDeleteScopeSpecificationRequest,
+  MsgModifyOSLocatorRequest,
+  MsgP8eMemorializeContractRequest,
+  MsgWriteContractSpecificationRequest,
+  MsgWriteP8eContractSpecRequest,
+  MsgWriteRecordRequest,
+  MsgWriteRecordSpecificationRequest,
+  MsgWriteScopeRequest,
+  MsgWriteScopeSpecificationRequest,
+  MsgWriteSessionRequest,
+} from '../proto/provenance/metadata/v1/tx_pb';
+import {
+  MsgAddAttributeRequest,
+  MsgDeleteAttributeRequest,
+  MsgDeleteDistinctAttributeRequest,
+  MsgUpdateAttributeRequest,
+} from '../proto/provenance/attribute/v1/tx_pb';
+import {
+  MsgActivateRequest,
+  MsgAddAccessRequest,
+  MsgAddMarkerRequest,
+  MsgBurnRequest,
+  MsgCancelRequest,
+  MsgDeleteAccessRequest,
+  MsgDeleteRequest,
+  MsgFinalizeRequest,
+  MsgMintRequest,
+  MsgSetDenomMetadataRequest,
+  MsgTransferRequest,
+  MsgWithdrawRequest,
+} from '../proto/provenance/marker/v1/tx_pb';
+import {
   MsgSetWithdrawAddress,
   MsgWithdrawDelegatorReward,
   MsgWithdrawValidatorCommission,
@@ -40,8 +87,8 @@ import { MsgSubmitEvidence } from '../proto/cosmos/evidence/v1beta1/tx_pb';
 import { Evidence } from '../proto/tendermint/abci/types_pb';
 import { PubKey } from '../proto/cosmos/crypto/secp256k1/keys_pb';
 
-import type { ExecuteMsg } from './schema/ats-smart-contract/execute_msg';
-import type { ExecuteMsg as DigitalCurrencyConsortiumExecuteMsg } from './schema/digital-currency-consortium/execute_msg';
+import { ExecuteMsg } from './schema/ats-smart-contract/execute_msg';
+import { ExecuteMsg as DigitalCurrencyConsortiumExecuteMsg } from './schema/digital-currency-consortium/execute_msg';
 
 export type SupportedMessageTypeNames =
   | 'cosmos.authz.v1beta1.MsgGrant'
@@ -354,4 +401,70 @@ export type MsgCreateValidatorDisplay = Omit<
   'pubkey'
 > & {
   pubkey: PubKey.AsObject;
+};
+
+export const MESSAGE_PROTOS: { [key in SupportedMessageTypeNames]: typeof Message } = {
+  'cosmos.authz.v1beta1.MsgGrant': MsgGrant,
+  'cosmos.bank.v1beta1.MsgSend': MsgSend,
+  'cosmos.crisis.v1beta1.MsgVerifyInvariant': MsgVerifyInvariant,
+  'cosmos.crypto.secp256k1.PubKey': PubKey,
+  'cosmos.distribution.v1beta1.MsgFundCommunityPool': MsgFundCommunityPool,
+  'cosmos.distribution.v1beta1.MsgSetWithdrawAddress': MsgSetWithdrawAddress,
+  'cosmos.distribution.v1beta1.MsgWithdrawDelegatorReward': MsgWithdrawDelegatorReward,
+  'cosmos.distribution.v1beta1.MsgWithdrawValidatorCommission': MsgWithdrawValidatorCommission,
+  'cosmos.evidence.v1beta1.MsgSubmitEvidence': MsgSubmitEvidence,
+  'cosmos.gov.v1beta1.MsgDeposit': MsgDeposit,
+  'cosmos.gov.v1beta1.MsgSubmitProposal': MsgSubmitProposal,
+  'cosmos.gov.v1beta1.MsgVote': MsgVote,
+  'cosmos.gov.v1beta1.Proposal': Proposal,
+  'cosmos.slashing.v1beta1.MsgUnjail': MsgUnjail,
+  'cosmos.staking.v1beta1.MsgBeginRedelegate': MsgBeginRedelegate,
+  'cosmos.staking.v1beta1.MsgCreateValidator': MsgCreateValidator,
+  'cosmos.staking.v1beta1.MsgDelegate': MsgDelegate,
+  'cosmos.staking.v1beta1.MsgEditValidator': MsgEditValidator,
+  'cosmos.staking.v1beta1.MsgUndelegate': MsgUndelegate,
+  'cosmos.vesting.v1beta1.MsgCreateVestingAccount': MsgCreateVestingAccount,
+  'cosmwasm.wasm.v1.MsgExecuteContract': MsgExecuteContract,
+  'provenance.attribute.v1.MsgAddAttributeRequest': MsgAddAttributeRequest,
+  'provenance.attribute.v1.MsgDeleteAttributeRequest': MsgDeleteAttributeRequest,
+  'provenance.attribute.v1.MsgDeleteDistinctAttributeRequest': MsgDeleteDistinctAttributeRequest,
+  'provenance.attribute.v1.MsgUpdateAttributeRequest': MsgUpdateAttributeRequest,
+  'provenance.marker.v1.MarkerTransferAuthorization': MarkerTransferAuthorization,
+  'provenance.marker.v1.MsgActivateRequest': MsgActivateRequest,
+  'provenance.marker.v1.MsgAddAccessRequest': MsgAddAccessRequest,
+  'provenance.marker.v1.MsgAddMarkerRequest': MsgAddMarkerRequest,
+  'provenance.marker.v1.MsgBurnRequest': MsgBurnRequest,
+  'provenance.marker.v1.MsgCancelRequest': MsgCancelRequest,
+  'provenance.marker.v1.MsgDeleteAccessRequest': MsgDeleteAccessRequest,
+  'provenance.marker.v1.MsgDeleteRequest': MsgDeleteRequest,
+  'provenance.marker.v1.MsgFinalizeRequest': MsgFinalizeRequest,
+  'provenance.marker.v1.MsgMintRequest': MsgMintRequest,
+  'provenance.marker.v1.MsgSetDenomMetadataRequest': MsgSetDenomMetadataRequest,
+  'provenance.marker.v1.MsgTransferRequest': MsgTransferRequest,
+  'provenance.marker.v1.MsgWithdrawRequest': MsgWithdrawRequest,
+  'provenance.metadata.v1.MsgAddContractSpecToScopeSpecRequest': MsgAddContractSpecToScopeSpecRequest,
+  'provenance.metadata.v1.MsgAddScopeDataAccessRequest': MsgAddScopeDataAccessRequest,
+  'provenance.metadata.v1.MsgAddScopeOwnerRequest': MsgAddScopeOwnerRequest,
+  'provenance.metadata.v1.MsgBindOSLocatorRequest': MsgBindOSLocatorRequest,
+  'provenance.metadata.v1.MsgDeleteContractSpecFromScopeSpecRequest': MsgDeleteContractSpecFromScopeSpecRequest,
+  'provenance.metadata.v1.MsgDeleteContractSpecificationRequest': MsgDeleteContractSpecificationRequest,
+  'provenance.metadata.v1.MsgDeleteOSLocatorRequest': MsgDeleteOSLocatorRequest,
+  'provenance.metadata.v1.MsgDeleteRecordRequest': MsgDeleteRecordRequest,
+  'provenance.metadata.v1.MsgDeleteRecordSpecificationRequest': MsgDeleteRecordSpecificationRequest,
+  'provenance.metadata.v1.MsgDeleteScopeDataAccessRequest': MsgDeleteScopeDataAccessRequest,
+  'provenance.metadata.v1.MsgDeleteScopeOwnerRequest': MsgDeleteScopeOwnerRequest,
+  'provenance.metadata.v1.MsgDeleteScopeRequest': MsgDeleteScopeRequest,
+  'provenance.metadata.v1.MsgDeleteScopeSpecificationRequest': MsgDeleteScopeSpecificationRequest,
+  'provenance.metadata.v1.MsgModifyOSLocatorRequest': MsgModifyOSLocatorRequest,
+  'provenance.metadata.v1.MsgP8eMemorializeContractRequest': MsgP8eMemorializeContractRequest,
+  'provenance.metadata.v1.MsgWriteContractSpecificationRequest': MsgWriteContractSpecificationRequest,
+  'provenance.metadata.v1.MsgWriteP8eContractSpecRequest': MsgWriteP8eContractSpecRequest,
+  'provenance.metadata.v1.MsgWriteRecordRequest': MsgWriteRecordRequest,
+  'provenance.metadata.v1.MsgWriteRecordSpecificationRequest': MsgWriteRecordSpecificationRequest,
+  'provenance.metadata.v1.MsgWriteScopeRequest': MsgWriteScopeRequest,
+  'provenance.metadata.v1.MsgWriteScopeSpecificationRequest': MsgWriteScopeSpecificationRequest,
+  'provenance.metadata.v1.MsgWriteSessionRequest': MsgWriteSessionRequest,
+  'provenance.name.v1.MsgBindNameRequest': MsgBindNameRequest,
+  'provenance.name.v1.MsgDeleteNameRequest': MsgDeleteNameRequest,
+  'tendermint.abci.Evidence': Evidence,
 };
