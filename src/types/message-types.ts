@@ -81,7 +81,7 @@ import {
   InstantiateContractProposal,
 } from '../proto/cosmwasm/wasm/v1/proposal_pb';
 import { AccessConfig } from '../proto/cosmwasm/wasm/v1/types_pb';
-import { ParameterChangeProposal } from '../proto/cosmos/params/v1beta1/params_pb';
+import { ParamChange, ParameterChangeProposal } from '../proto/cosmos/params/v1beta1/params_pb';
 import { MsgExecuteContract } from '../proto/cosmwasm/wasm/v1/tx_pb';
 import { MsgSubmitEvidence } from '../proto/cosmos/evidence/v1beta1/tx_pb';
 import { Evidence } from '../proto/tendermint/abci/types_pb';
@@ -106,22 +106,22 @@ export type SupportedMessageTypeNames =
   | 'cosmos.gov.v1beta1.MsgVoteWeighted'
   | 'cosmos.gov.v1beta1.Proposal'
   | 'cosmos.gov.v1beta1.TextProposal'
-  | 'cosmos.upgrade.v1beta1.SoftwareUpgradeProposal'
-  | 'cosmos.upgrade.v1beta1.CancelSoftwareUpgradeProposal'
-  | 'cosmos.upgrade.v1beta1.Plan'
-  | 'cosmwasm.wasm.v1.StoreCodeProposal'
-  | 'cosmwasm.wasm.v1.InstantiateCodeProposal'
-  | 'cosmwasm.wasm.v1.AccessConfig'
-  | 'cosmos.params.v1beta1.ParameterChangeProposal'
   | 'cosmos.params.v1beta1.ParamChange'
+  | 'cosmos.params.v1beta1.ParameterChangeProposal'
   | 'cosmos.slashing.v1beta1.MsgUnjail'
   | 'cosmos.staking.v1beta1.MsgBeginRedelegate'
   | 'cosmos.staking.v1beta1.MsgCreateValidator'
   | 'cosmos.staking.v1beta1.MsgDelegate'
   | 'cosmos.staking.v1beta1.MsgEditValidator'
   | 'cosmos.staking.v1beta1.MsgUndelegate'
+  | 'cosmos.upgrade.v1beta1.CancelSoftwareUpgradeProposal'
+  | 'cosmos.upgrade.v1beta1.Plan'
+  | 'cosmos.upgrade.v1beta1.SoftwareUpgradeProposal'
   | 'cosmos.vesting.v1beta1.MsgCreateVestingAccount'
+  | 'cosmwasm.wasm.v1.AccessConfig'
+  | 'cosmwasm.wasm.v1.InstantiateCodeProposal'
   | 'cosmwasm.wasm.v1.MsgExecuteContract'
+  | 'cosmwasm.wasm.v1.StoreCodeProposal'
   | 'provenance.attribute.v1.MsgAddAttributeRequest'
   | 'provenance.attribute.v1.MsgDeleteAttributeRequest'
   | 'provenance.attribute.v1.MsgDeleteDistinctAttributeRequest'
@@ -417,14 +417,24 @@ export const MESSAGE_PROTOS: { [key in SupportedMessageTypeNames]: typeof Messag
   'cosmos.gov.v1beta1.MsgSubmitProposal': MsgSubmitProposal,
   'cosmos.gov.v1beta1.MsgVote': MsgVote,
   'cosmos.gov.v1beta1.Proposal': Proposal,
+  'cosmos.gov.v1beta1.TextProposal': TextProposal,
+  'cosmos.params.v1beta1.ParamChange': ParamChange,
+  'cosmos.params.v1beta1.ParameterChangeProposal': ParameterChangeProposal,
   'cosmos.slashing.v1beta1.MsgUnjail': MsgUnjail,
   'cosmos.staking.v1beta1.MsgBeginRedelegate': MsgBeginRedelegate,
   'cosmos.staking.v1beta1.MsgCreateValidator': MsgCreateValidator,
   'cosmos.staking.v1beta1.MsgDelegate': MsgDelegate,
   'cosmos.staking.v1beta1.MsgEditValidator': MsgEditValidator,
   'cosmos.staking.v1beta1.MsgUndelegate': MsgUndelegate,
+  'cosmos.upgrade.v1beta1.CancelSoftwareUpgradeProposal': CancelSoftwareUpgradeProposal,
+  'cosmos.upgrade.v1beta1.Plan': Plan,
+  'cosmos.upgrade.v1beta1.SoftwareUpgradeProposal': SoftwareUpgradeProposal,
   'cosmos.vesting.v1beta1.MsgCreateVestingAccount': MsgCreateVestingAccount,
+  'cosmwasm.wasm.v1.AccessConfig': AccessConfig,
+  'cosmwasm.wasm.v1.InstantiateCodeProposal': InstantiateContractProposal,
   'cosmwasm.wasm.v1.MsgExecuteContract': MsgExecuteContract,
+  'cosmwasm.wasm.v1.StoreCodeProposal': StoreCodeProposal,
+  'cosmos.gov.v1beta1.MsgVoteWeighted': MsgVoteWeighted,
   'provenance.attribute.v1.MsgAddAttributeRequest': MsgAddAttributeRequest,
   'provenance.attribute.v1.MsgDeleteAttributeRequest': MsgDeleteAttributeRequest,
   'provenance.attribute.v1.MsgDeleteDistinctAttributeRequest': MsgDeleteDistinctAttributeRequest,
