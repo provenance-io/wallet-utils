@@ -1,6 +1,6 @@
 {
   "name": "@provenanceio/wallet-utils",
-  "version": "0.0.1-development",
+  "version": "0.0.0-development",
   "description": "Typescript Utilities for Provenance Blockchain Wallet",
   "main": "lib/index.js",
   "module": "esm/index.js",
