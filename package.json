@@ -21,7 +21,7 @@
     "build:protos": "bash ./scripts/build_protos.sh",
     "build:schemas": "json2ts -i third_party/schema -o src/types/schema/",
     "clean": "rm -rf ./lib ./esm",
-    "commit": "cz",
+    "commit": "npx cz",
     "postbuild": "node ./scripts/checkCircularDeps.js",
     "pull:protos": "bash ./scripts/pull_protos.sh",
     "prepare": "npm run build && husky install",
