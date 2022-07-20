@@ -50,7 +50,10 @@ import {
 } from '../proto/cosmos/tx/v1beta1/tx_pb';
 import { CalculateTxFeesRequest } from '../proto/provenance/msgfees/v1/query_pb';
 import { SignMode } from '../proto/cosmos/tx/signing/v1beta1/signing_pb';
-import { BroadcastMode, BroadcastTxRequest } from '../proto/cosmos/tx/v1beta1/service_pb';
+import {
+  BroadcastMode,
+  BroadcastTxRequest,
+} from '../proto/cosmos/tx/v1beta1/service_pb';
 
 export type GenericDisplay = { [key: string]: any };
 
@@ -138,12 +141,12 @@ export const signBytes = (bytes: Uint8Array, privateKey: Bytes): Uint8Array => {
 };
 
 interface CalculateTxFeesRequestParams {
-  msgAny: google_protobuf_any_pb.Any | google_protobuf_any_pb.Any[],
-  account: BaseAccount,
-  publicKey: Bytes,
-  gasPriceDenom?: SupportedDenoms,
-  gasPrice: number,
-  gasAdjustment?: number,
+  msgAny: google_protobuf_any_pb.Any | google_protobuf_any_pb.Any[];
+  account: BaseAccount;
+  publicKey: Bytes;
+  gasPriceDenom?: SupportedDenoms;
+  gasPrice: number;
+  gasAdjustment?: number;
 }
 
 export const buildCalculateTxFeeRequest = ({
@@ -168,6 +171,9 @@ export const buildCalculateTxFeeRequest = ({
   calculateTxFeeRequest.setGasAdjustment(gasAdjustment);
   return calculateTxFeeRequest;
 };
+
+const encoder = new TextEncoder();
+const decoder = new TextDecoder('utf-8');
 
 export const buildMessage = (
   type: ReadableMessageNames,
@@ -219,6 +225,22 @@ export const buildMessage = (
       });
       return msgSend;
     }
+
+    case 'MsgExecuteContract': {
+      const { sender, contract, msg, fundsList } =
+        params as MsgExecuteContractParams;
+      const msgExecuteContract = new MsgExecuteContract()
+        .setContract(contract)
+        .setSender(sender)
+        .setMsg(encoder.encode(JSON.stringify(msg)));
+      if (fundsList)
+        fundsList.forEach(({ denom, amount }) => {
+          msgExecuteContract.addFunds(
+            new Coin().setAmount(`${amount}`).setDenom(denom)
+          );
+        });
+      return msgExecuteContract;
+    }
   }
 };
 
@@ -236,15 +258,15 @@ export const msgAnyB64toAny = (msgAnyB64: string): google_protobuf_any_pb.Any =>
 };
 
 interface buildBroadcastTxRequestProps {
-  msgAny: google_protobuf_any_pb.Any | google_protobuf_any_pb.Any[],
-  account: BaseAccount,
-  chainId: string,
-  wallet: Wallet,
-  feeEstimate: number,
-  memo: string,
-  feeDenom: SupportedDenoms,
-  gasEstimate: number,
-};
+  msgAny: google_protobuf_any_pb.Any | google_protobuf_any_pb.Any[];
+  account: BaseAccount;
+  chainId: string;
+  wallet: Wallet;
+  feeEstimate: number;
+  memo: string;
+  feeDenom: SupportedDenoms;
+  gasEstimate: number;
+}
 
 export const buildBroadcastTxRequest = ({
   msgAny,
@@ -271,17 +293,21 @@ export const buildBroadcastTxRequest = ({
   txRequest.setTxBytes(txRaw.serializeBinary());
   txRequest.setMode(BroadcastMode.BROADCAST_MODE_SYNC);
   return txRequest;
-}
+};
 
-export const unpackDisplayObjectFromWalletMessage = (anyMsgBase64: string): (MsgSendDisplay | MsgExecuteContractDisplay | GenericDisplay) & {
+export const unpackDisplayObjectFromWalletMessage = (
+  anyMsgBase64: string
+): (MsgSendDisplay | MsgExecuteContractDisplay | GenericDisplay) & {
   typeName: ReadableMessageNames | FallbackGenericMessageName;
 } => {
-  const decoder = new TextDecoder('utf-8');
   const msgBytes = base64ToBytes(anyMsgBase64);
   const msgAny = google_protobuf_any_pb.Any.deserializeBinary(msgBytes);
   const typeName = msgAny.getTypeName() as SupportedMessageTypeNames;
   if (MESSAGE_PROTOS[typeName]) {
-    const message = msgAny.unpack(MESSAGE_PROTOS[typeName].deserializeBinary, typeName);
+    const message = msgAny.unpack(
+      MESSAGE_PROTOS[typeName].deserializeBinary,
+      typeName
+    );
     switch (typeName) {
       case 'cosmos.bank.v1beta1.MsgSend':
         return {
@@ -292,7 +318,9 @@ export const unpackDisplayObjectFromWalletMessage = (anyMsgBase64: string): (Msg
         return {
           typeName: 'MsgExecuteContractGeneric',
           sender: (message as MsgExecuteContract).getSender(),
-          msg: JSON.parse(decoder.decode((message as MsgExecuteContract).getMsg() as Uint8Array)),
+          msg: JSON.parse(
+            decoder.decode((message as MsgExecuteContract).getMsg() as Uint8Array)
+          ),
           fundsList: (message as MsgExecuteContract).getFundsList().map((coin) => ({
             denom: coin.getDenom(),
             amount: Number(coin.getAmount()),
@@ -306,4 +334,4 @@ export const unpackDisplayObjectFromWalletMessage = (anyMsgBase64: string): (Msg
     }
   }
   throw new Error(`Message type: ${typeName} is not supported for display.`);
-}
+};
