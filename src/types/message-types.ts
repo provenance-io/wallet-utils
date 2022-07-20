@@ -95,6 +95,7 @@ import { PubKey } from '../proto/cosmos/crypto/secp256k1/keys_pb';
 
 import { ExecuteMsg } from './schema/ats-smart-contract/execute_msg';
 import { ExecuteMsg as DigitalCurrencyConsortiumExecuteMsg } from './schema/digital-currency-consortium/execute_msg';
+import { CoinAsObject } from './layout';
 
 export type SupportedMessageTypeNames =
   | 'cosmos.authz.v1beta1.MsgGrant'
@@ -394,14 +395,6 @@ export type MsgExecuteContractParams =
   | (Omit<MsgExecuteContract.AsObject, 'msg'> & {
       msg: DigitalCurrencyConsortiumExecuteMsg;
     });
-
-export type CoinAsObject = { denom: string; amount: string | number };
-
-export type MsgExecuteContractDisplay = {
-  sender: string;
-  msg: any;
-  fundsList: CoinAsObject[];
-};
 
 export type MsgSubmitEvidenceDisplay = Omit<
   MsgSubmitEvidence.AsObject,
