@@ -54,6 +54,8 @@ import {
   BroadcastMode,
   BroadcastTxRequest,
 } from '../proto/cosmos/tx/v1beta1/service_pb';
+import { MsgAddMarkerRequest } from 'proto/provenance/marker/v1/tx_pb';
+import { MarkerStatus, MarkerType } from 'proto/provenance/marker/v1/marker_pb';
 
 export type GenericDisplay = { [key: string]: any };
 
@@ -325,6 +327,19 @@ export const unpackDisplayObjectFromWalletMessage = (
             denom: coin.getDenom(),
             amount: Number(coin.getAmount()),
           })),
+        };
+      case 'provenance.marker.v1.MsgAddMarkerRequest':
+        const getKey = (map: { [key: string]: any }, val: any) =>
+          Object.keys(map).find((key) => map[key] === val);
+
+        return {
+          typeName: 'MsgAddMarkerRequest',
+          ...(message as MsgAddMarkerRequest).toObject(),
+          markerType: getKey(
+            MarkerType,
+            (message as MsgAddMarkerRequest).getMarkerType()
+          ),
+          status: getKey(MarkerStatus, (message as MsgAddMarkerRequest).getStatus()),
         };
       default:
         return {
