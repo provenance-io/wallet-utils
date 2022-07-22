@@ -54,8 +54,8 @@ import {
   BroadcastMode,
   BroadcastTxRequest,
 } from '../proto/cosmos/tx/v1beta1/service_pb';
-import { MsgAddMarkerRequest } from 'proto/provenance/marker/v1/tx_pb';
-import { MarkerStatus, MarkerType } from 'proto/provenance/marker/v1/marker_pb';
+import { MsgAddMarkerRequest } from '../proto/provenance/marker/v1/tx_pb';
+import { MarkerStatus, MarkerType } from '../proto/provenance/marker/v1/marker_pb';
 
 export type GenericDisplay = { [key: string]: any };
 
