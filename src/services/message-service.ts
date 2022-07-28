@@ -218,7 +218,6 @@ export const buildMessage = (
 
     case 'MsgSend': {
       const { fromAddress, toAddress, amountList } = params as MsgSendDisplay;
-      // log(`Building MsgSend: ${fromAddress} to ${toAddress}`);
       const msgSend = new MsgSend()
         .setFromAddress(fromAddress)
         .setToAddress(toAddress);
@@ -289,7 +288,6 @@ export const buildBroadcastTxRequest = ({
   txRaw.setAuthInfoBytes(authInfo.serializeBinary());
   const signDoc = buildSignDoc(account.getAccountNumber(), chainId, txRaw);
   const signature = signBytes(signDoc.serializeBinary(), wallet.privateKey);
-  // const verified = chainService.verifyTx(signDocBinary, bytesToBase64(wallet.publicKey), signature);
   txRaw.setSignaturesList([signature]);
   const txRequest = new BroadcastTxRequest();
   txRequest.setTxBytes(txRaw.serializeBinary());
