@@ -293,7 +293,7 @@ export const buildBroadcastTxRequest = ({
   txRaw.setSignaturesList([signature]);
   const txRequest = new BroadcastTxRequest();
   txRequest.setTxBytes(txRaw.serializeBinary());
-  txRequest.setMode(BroadcastMode.BROADCAST_MODE_SYNC);
+  txRequest.setMode(BroadcastMode.BROADCAST_MODE_BLOCK);
   return txRequest;
 };
 
