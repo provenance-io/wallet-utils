@@ -11,7 +11,10 @@ import {
 } from '../proto/provenance/msgfees/v1/query_pb';
 import { QueryClient as MsgFeeQueryClient } from '../proto/provenance/msgfees/v1/query_grpc_web_pb';
 import { ServiceClient as TxServiceClient } from '../proto/cosmos/tx/v1beta1/service_grpc_web_pb';
-import { BroadcastTxRequest, BroadcastTxResponse } from '../proto/cosmos/tx/v1beta1/service_pb';
+import {
+  BroadcastTxRequest,
+  BroadcastTxResponse,
+} from '../proto/cosmos/tx/v1beta1/service_pb';
 
 export const calculateTxFees = (
   serviceAddress: string,
@@ -81,17 +84,27 @@ export const getAccountInfo = (
   });
 };
 
-export const broadcastTx = async (serviceAddress: string, request: BroadcastTxRequest): Promise<BroadcastTxResponse.AsObject> => {
+export const broadcastTx = async (
+  serviceAddress: string,
+  request: BroadcastTxRequest
+): Promise<BroadcastTxResponse.AsObject> => {
   if (!serviceAddress) throw new Error('GrpcService requires serviceAddress');
-  console.log('Initiating broadcastTx');
   const txClient = new TxServiceClient(serviceAddress, null);
   return new Promise((resolve, reject) => {
-    txClient.broadcastTx(request, null, (error: ServerError, response: BroadcastTxResponse) => {
-      if (error) reject(new Error(`broadcastTx error: Code: ${error.code} Message: ${error.message}`));
-      else {
-        console.log(JSON.stringify(response.toObject()));
-        resolve(response.toObject());
+    txClient.broadcastTx(
+      request,
+      null,
+      (error: ServerError, response: BroadcastTxResponse) => {
+        if (error)
+          reject(
+            new Error(
+              `broadcastTx error: Code: ${error.code} Message: ${error.message}`
+            )
+          );
+        else {
+          resolve(response.toObject());
+        }
       }
-    });
+    );
   });
 };

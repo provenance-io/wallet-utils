@@ -56,6 +56,7 @@ import {
 } from '../proto/cosmos/tx/v1beta1/service_pb';
 import { MsgAddMarkerRequest } from '../proto/provenance/marker/v1/tx_pb';
 import { MarkerStatus, MarkerType } from '../proto/provenance/marker/v1/marker_pb';
+import { Access } from '../proto/provenance/marker/v1/accessgrant_pb';
 
 export type GenericDisplay = { [key: string]: any };
 
@@ -280,7 +281,6 @@ export const buildBroadcastTxRequest = ({
   feeDenom = 'nhash',
   gasEstimate,
 }: buildBroadcastTxRequestProps): BroadcastTxRequest => {
-  console.log(`Building tx request for broadcast`);
   const signerInfo = buildSignerInfo(account, wallet.publicKey);
   const authInfo = buildAuthInfo(signerInfo, feeDenom, feeEstimate, gasEstimate);
   const txBody = buildTxBody(msgAny, memo);
@@ -340,6 +340,16 @@ export const unpackDisplayObjectFromWalletMessage = (
             (message as MsgAddMarkerRequest).getMarkerType()
           ),
           status: getKey(MarkerStatus, (message as MsgAddMarkerRequest).getStatus()),
+          accessListList: (message as MsgAddMarkerRequest)
+            .getAccessListList()
+            .map((list) => {
+              return {
+                address: list.getAddress(),
+                permissionsList: list
+                  .getPermissionsList()
+                  .map((perm) => getKey(Access, perm)),
+              };
+            }),
         };
       default:
         return {
