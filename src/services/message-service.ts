@@ -71,15 +71,54 @@ export type FallbackGenericMessageName = 'MsgGeneric' | 'MsgExecuteContractGener
 export const buildAuthInfo = (
   signerInfo: SignerInfo,
   feeDenom: SupportedDenoms,
-  feeEstimate = 0,
-  gasEstimate: number
+  feeEstimate: CoinAsObject[] = [],
+  gasLimit: number
 ): AuthInfo => {
-  const feeCoin = new Coin();
-  feeCoin.setDenom(feeDenom);
-  feeCoin.setAmount(feeEstimate.toString());
+  //
+  // TODO: Move feeList into it's own function and add unit tests
+  //
+
+  //
+  // This is to support a list of fees of any denom
+  // calculateTxFees should give a totalFeesList back
+  // that list is used here, only after you have added the gasFee to it
+  // which should be the estimatedGas amount received from calculateTxFees
+  // and multiplied by the desired gasPrice
+  const feeList = feeEstimate
+    .reduce((agg: CoinAsObject[], curr: CoinAsObject) => {
+      // Find if the same coin is already in the aggregated list
+      const sameCoin = agg.find((i) => i.denom === curr.denom);
+      if (sameCoin) {
+        // if it is find the index of it
+        const sameCoinInd = agg.findIndex((i) => i.denom === sameCoin.denom);
+        // create a new array from the aggregate so we don't mutate it
+        const result = [...agg];
+        // change the item in place to add the current amount to whatever it currently is
+        result[sameCoinInd] = {
+          amount: +sameCoin.amount + +curr.amount,
+          denom: curr.denom,
+        };
+        // return the resulting array
+        return result;
+      }
+
+      // if the coin wasn't already in the aggregate just add it to the aggregate here
+      return [...agg, curr];
+    }, [])
+    // sort by denom name in ascending order (assumes all denoms are lowercase)
+    .sort((a, b) => (a.denom > b.denom ? 1 : -1))
+    .map((feeItem) => {
+      // map each feeItem and create a coin out of it
+      const feeCoin = new Coin();
+      feeCoin.setDenom(feeItem.denom);
+      // since the amount can be a string or number we convert it to a string here
+      feeCoin.setAmount(feeItem.amount.toString());
+      return feeCoin;
+    });
+
   const fee = new Fee();
-  fee.setAmountList([feeCoin]);
-  fee.setGasLimit(gasEstimate);
+  fee.setAmountList(feeList);
+  fee.setGasLimit(gasLimit);
   const authInfo = new AuthInfo();
   authInfo.setFee(fee);
   authInfo.setSignerInfosList([signerInfo].filter((f) => f));
@@ -148,7 +187,7 @@ interface CalculateTxFeesRequestParams {
   account: BaseAccount;
   publicKey: Bytes;
   gasPriceDenom?: SupportedDenoms;
-  gasPrice: number;
+  gasLimit: number;
   gasAdjustment?: number;
 }
 
@@ -157,11 +196,11 @@ export const buildCalculateTxFeeRequest = ({
   account,
   publicKey,
   gasPriceDenom = 'nhash',
-  gasPrice,
+  gasLimit,
   gasAdjustment = 1.25,
 }: CalculateTxFeesRequestParams): CalculateTxFeesRequest => {
   const signerInfo = buildSignerInfo(account, publicKey);
-  const authInfo = buildAuthInfo(signerInfo, gasPriceDenom, undefined, gasPrice);
+  const authInfo = buildAuthInfo(signerInfo, gasPriceDenom, undefined, gasLimit);
   const txBody = buildTxBody(msgAny);
   const txRaw = new TxRaw();
   txRaw.setBodyBytes(txBody.serializeBinary());
@@ -264,10 +303,10 @@ interface buildBroadcastTxRequestProps {
   account: BaseAccount;
   chainId: string;
   wallet: Wallet;
-  feeEstimate: number;
+  feeEstimate: CoinAsObject[];
   memo: string;
   feeDenom: SupportedDenoms;
-  gasEstimate: number;
+  gasLimit: number;
 }
 
 export const buildBroadcastTxRequest = ({
@@ -278,10 +317,10 @@ export const buildBroadcastTxRequest = ({
   feeEstimate,
   memo = '',
   feeDenom = 'nhash',
-  gasEstimate,
+  gasLimit,
 }: buildBroadcastTxRequestProps): BroadcastTxRequest => {
   const signerInfo = buildSignerInfo(account, wallet.publicKey);
-  const authInfo = buildAuthInfo(signerInfo, feeDenom, feeEstimate, gasEstimate);
+  const authInfo = buildAuthInfo(signerInfo, feeDenom, feeEstimate, gasLimit);
   const txBody = buildTxBody(msgAny, memo);
   const txRaw = new TxRaw();
   txRaw.setBodyBytes(txBody.serializeBinary());
