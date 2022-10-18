@@ -57,6 +57,18 @@ import {
 import { MsgAddMarkerRequest } from '../proto/provenance/marker/v1/tx_pb';
 import { MarkerStatus, MarkerType } from '../proto/provenance/marker/v1/marker_pb';
 import { Access } from '../proto/provenance/marker/v1/accessgrant_pb';
+import {
+  capitalize,
+  defaultFieldKeyToDisplayFunctionMap,
+  displayCapitalizedString,
+  getJSType,
+  hashFormat,
+  MessageObject,
+  MsgFieldKeys,
+  numberFormat,
+  trimString,
+} from '../utils';
+import { format } from 'date-fns';
 
 export type GenericDisplay = { [key: string]: any };
 
@@ -334,6 +346,12 @@ export const buildBroadcastTxRequest = ({
   return txRequest;
 };
 
+/**
+ * Unpacks an anyMsgBase64 string to a formatted JSON object. The
+ * display object templates are mapped to {@link SupportedMessageTypeNames}.
+ * The display object returned contains a typeName field representing
+ * the given SupportedMessageTypeNames type (i.e. cosmos.bank.v1beta1.MsgSend -> MsgSend).
+ */
 export const unpackDisplayObjectFromWalletMessage = (
   anyMsgBase64: string
 ): (MsgSendDisplay | MsgExecuteContractDisplay | GenericDisplay) & {
@@ -396,4 +414,113 @@ export const unpackDisplayObjectFromWalletMessage = (
     }
   }
   throw new Error(`Message type: ${typeName} is not supported for display.`);
+};
+
+const recurseFormatDisplayValue = (
+  finalFlattenedDisplayObject: MessageObject,
+  currDisplayObject: MessageObject,
+  keyToFormattingFunctionMap: typeof defaultFieldKeyToDisplayFunctionMap,
+  parentFieldKey?: MsgFieldKeys
+) => {
+  Object.entries(currDisplayObject).forEach(([currentField, currentValue]) => {
+    // Certain fields are spefically formatted based on their name, default to just display a capitalized string
+    const formattingFunction =
+      keyToFormattingFunctionMap[currentField as MsgFieldKeys];
+    // If no formattingFunction mapped, just return what was passed. i.e. array or object
+    const currentFormattedValue = formattingFunction
+      ? formattingFunction(currentValue)
+      : currentValue;
+    // What type is the current value we're looking at
+    const currentFieldValueJSType = getJSType(currentFormattedValue);
+    // No more looping (non array/obj), just write to finalMessage object
+    if (
+      currentFieldValueJSType !== 'array' &&
+      currentFieldValueJSType !== 'object'
+    ) {
+      parentFieldKey
+        ? (finalFlattenedDisplayObject[parentFieldKey][currentField] =
+            currentFormattedValue)
+        : (finalFlattenedDisplayObject[currentField as MsgFieldKeys] =
+            currentFormattedValue);
+      return;
+    }
+
+    // Value is an array []
+    if (currentFieldValueJSType === 'array') {
+      const currentFieldValueArray = currentFormattedValue as unknown as any[];
+      // Determine if we need to display multiple items from the array
+      const multiItem = currentFieldValueArray.length > 1;
+      // End the loop if array consists of strings or numbers
+      const endLoop = !currentFieldValueArray.find(
+        (val) => getJSType(val) !== 'string' && getJSType(val) !== 'number'
+      );
+      // Array is all string/numbers (combine and display)
+      if (endLoop) {
+        const currentFieldCombinedValue = currentFieldValueArray.join(`\n`);
+        parentFieldKey
+          ? (finalFlattenedDisplayObject[parentFieldKey][currentField] =
+              currentFieldCombinedValue)
+          : (finalFlattenedDisplayObject[currentField as MsgFieldKeys] =
+              currentFieldCombinedValue);
+        return;
+      } else {
+        // Array needs additional looping (object/array children)
+        currentFieldValueArray.forEach((cfArrayVal: any, index: number) => {
+          const newCfName = `${
+            multiItem ? `${currentField} ${index + 1}` : currentField
+          }` as MsgFieldKeys;
+          finalFlattenedDisplayObject[newCfName] = {};
+          recurseFormatDisplayValue(
+            finalFlattenedDisplayObject,
+            cfArrayVal as MessageObject,
+            keyToFormattingFunctionMap,
+            newCfName
+          );
+          return;
+        });
+      }
+    }
+
+    // Value is an object {}
+    if (currentFieldValueJSType === 'object') {
+      // Create this entry in the finalMessage, then repeat loop targeting it
+      finalFlattenedDisplayObject[currentField as MsgFieldKeys] = {};
+      recurseFormatDisplayValue(
+        finalFlattenedDisplayObject,
+        currDisplayObject,
+        keyToFormattingFunctionMap,
+        currentField as MsgFieldKeys
+      );
+      return;
+    }
+  });
+};
+
+/**
+ * Formats a display object from {@link unpackDisplayObjectFromWalletMessage} by
+ * converting specified values mapped in the message format map and flattening the
+ * nexted object by recursing through each iterable value.
+ * keyToFormattingFunctionMap defaults to {@link defaultFieldKeyToDisplayFunctionMap}
+ */
+export const formatDisplayObject = ({
+  displayObject,
+  keyToFormattingFunctionMap = defaultFieldKeyToDisplayFunctionMap,
+}: {
+  displayObject: MessageObject;
+  keyToFormattingFunctionMap: typeof defaultFieldKeyToDisplayFunctionMap;
+}) => {
+  const finalMessage = {} as MessageObject;
+  if (displayObject) {
+    Object.values(displayObject).reduce(
+      () =>
+        recurseFormatDisplayValue(
+          finalMessage,
+          displayObject,
+          keyToFormattingFunctionMap
+        ),
+      {}
+    );
+  }
+
+  return finalMessage;
 };

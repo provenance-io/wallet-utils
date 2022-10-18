@@ -110,6 +110,7 @@
   "dependencies": {
     "@tendermint/belt": "0.3.0",
     "@tendermint/sig": "0.6.0",
+    "date-fns": "^2.29.3",
     "grpc-web": "1.2.0",
     "secp256k1": "4.0.3"
   },
