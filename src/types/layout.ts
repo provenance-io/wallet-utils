@@ -1,1 +1,3 @@
-export type CoinAsObject = { denom: string; amount: string | number };
+import { SupportedDenoms } from './denoms';
+
+export type CoinAsObject = { denom: SupportedDenoms; amount: string | number };
