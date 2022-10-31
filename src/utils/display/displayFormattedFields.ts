@@ -1,6 +1,6 @@
 import { trimString } from './trimString';
 import { hashFormat } from './hashFormat';
-import { CoinAsObject, SupportedDenoms } from 'types';
+import { CoinAsObject, SupportedDenoms } from '../../types';
 import { numberFormat } from './numberFormat';
 import { capitalize } from './capitalize';
 import { format } from 'date-fns';
