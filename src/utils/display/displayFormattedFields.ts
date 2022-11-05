@@ -4,30 +4,8 @@ import { CoinAsObject, SupportedDenoms } from '../../types';
 import { numberFormat } from './numberFormat';
 import { capitalize } from './capitalize';
 import { format } from 'date-fns';
+import { match, P } from 'ts-pattern';
 
-/**
- * Known field keys from messages that are mapped to a formatting util function in {@link MSG_FIELD_TO_FORMAT_UTIL_MAP}
- */
-export type MsgFieldKeys =
-  | 'address'
-  | 'administrator'
-  | 'amount'
-  | 'amountList'
-  | 'feeAmount'
-  | 'fromAddress'
-  | 'gasPrice'
-  | 'manager'
-  | 'recipientAddress'
-  | 'senderAddress'
-  | 'signer'
-  | 'status'
-  | 'time'
-  | 'toAddress'
-  | 'type';
-
-export type MessageObject = {
-  [key in MsgFieldKeys]: any;
-};
 type GasPrice = {
   gasPrice: number;
   gasPriceDenom: string;
@@ -90,30 +68,78 @@ export const displayDateAndTime = (fieldValue: string) => {
 };
 
 /**
- * Object keyed by {@link MsgFieldKeys} with the formatting util
- * function as the value.
+ * Deduce the formatting function based on the field and/or value. Value
+ * is formatted below, otherwise it may be an array/object which is
+ * recursively unpacked message-service and passed through the formatting
+ * function again.
+ *
  */
-export const defaultFieldKeyToDisplayFunctionMap: {
-  [key in MsgFieldKeys]:
-    | typeof displayAddress
-    | typeof displayAmountList
-    | typeof displayCapitalizedString
-    | typeof displayDateAndTime
-    | typeof displayCoinAsObject;
-} = {
-  address: displayAddress,
-  manager: displayAddress,
-  fromAddress: displayAddress,
-  toAddress: displayAddress,
-  senderAddress: displayAddress,
-  recipientAddress: displayAddress,
-  signer: displayAddress,
-  administrator: displayAddress,
-  amountList: displayAmountList,
-  feeAmount: displayHashFormat,
-  amount: displayCoinAsObject,
-  gasPrice: displayGasPrice,
-  type: displayCapitalizedString,
-  status: displayCapitalizedString,
-  time: displayDateAndTime,
-};
+export const formatSingleValue = (key: string, value: any) =>
+  match({ key, value })
+    // True => Yes, False => No
+    .with({ value: P.boolean }, () => (value ? 'Yes' : 'No'))
+    // Attempt to convert number or string to a Date
+    .with(
+      {
+        value: P.when(() => new Date(value)).toString() === 'Invalid Date',
+      },
+      () => displayDateAndTime(value)
+    )
+    // Blockchain address usually starts with tp. Trim all other strings without spaces.
+    .with(
+      {
+        value: P.when(
+          (str: any) =>
+            str.indexOf('tp') === 0 || (str.indexOf(' ') < 0 && str.length > 30)
+        ),
+      },
+      () => displayAddress(value)
+    )
+    // Values that are all caps separated by underscores, i.e. MARKER_TYPE_COIN
+    .with(
+      {
+        value: P.when(() => new RegExp('^[A-Z]+(?:_[A-Z]+)*$').test(value)),
+      },
+      () => displayCapitalizedString(value)
+    )
+    // Default print as string
+    .with({ value: P.string || P.number }, () => value.toString())
+    .otherwise(() => null);
+
+/**
+ * Deduce the formatting function based on the field and/or value. Value
+ * is formatted below, otherwise it may be an array/object which is
+ * recursively unpacked message-service and passed through the formatting
+ * function again.
+ */
+export const formatCustomObj = (key: string, value: any) =>
+  match({ key, value })
+    .with(
+      {
+        value: P.array({ denom: P.string, amount: P.string || P.number }),
+      },
+      () => displayAmountList(value)
+    )
+    .with(
+      {
+        value: { denom: P.string, amount: P.string || P.number },
+      },
+      () => displayCoinAsObject(value)
+    )
+    .with(
+      {
+        value: {
+          gasPriceDenom: P.string,
+          gasPrice: P.string || P.number,
+        },
+      },
+      () => displayGasPrice(value)
+    )
+    .with({ key: 'feeAmount' }, () => displayHashFormat(value))
+    .with(
+      {
+        value: P.when((p: any) => new Date(p)).toString() === 'Invalid Date',
+      },
+      () => displayDateAndTime(value)
+    )
+    .otherwise(() => null);
