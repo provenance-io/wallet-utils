@@ -31,7 +31,6 @@ import {
   MsgWithdrawValidatorCommissionDisplay,
   ReadableMessageNames,
   TYPE_NAMES_READABLE_MAP,
-  SupportedDenoms,
   SupportedMessageTypeNames,
 } from '../types';
 import { BaseAccount } from '../proto/cosmos/auth/v1beta1/auth_pb';
@@ -72,7 +71,7 @@ export type FallbackGenericMessageName = 'MsgGeneric' | 'MsgExecuteContractGener
 
 export const buildAuthInfo = (
   signerInfo: SignerInfo,
-  feeDenom: SupportedDenoms,
+  feeDenom: string,
   feeEstimate: CoinAsObject[] = [],
   gasLimit: number
 ): AuthInfo => {
@@ -188,7 +187,7 @@ interface CalculateTxFeesRequestParams {
   msgAny: google_protobuf_any_pb.Any | google_protobuf_any_pb.Any[];
   account: BaseAccount;
   publicKey: Bytes;
-  gasPriceDenom?: SupportedDenoms;
+  gasPriceDenom?: string;
   gasLimit: number;
   gasAdjustment?: number;
 }
@@ -307,7 +306,7 @@ interface buildBroadcastTxRequestProps {
   wallet: Wallet;
   feeEstimate: CoinAsObject[];
   memo: string;
-  feeDenom: SupportedDenoms;
+  feeDenom: string;
   gasLimit: number;
 }
 

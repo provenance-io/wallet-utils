@@ -1,6 +1,6 @@
 import { trimString } from './trimString';
 import { hashFormat } from './hashFormat';
-import { CoinAsObject, SupportedDenoms } from '../../types';
+import { CoinAsObject } from '../../types';
 import { numberFormat } from './numberFormat';
 import { capitalize } from './capitalize';
 import { format } from 'date-fns';
@@ -50,7 +50,6 @@ export const displayCoinAsObject = (fieldValue: string | number | CoinAsObject) 
       return `${amount} ${denom}`;
     case 'nhash':
       return `${hashFormat(amount)} Hash`;
-    // TODO do we care about other SupportedDenoms displays?
     default:
       return `${amount} ${denom}`;
   }
@@ -58,7 +57,7 @@ export const displayCoinAsObject = (fieldValue: string | number | CoinAsObject) 
 
 export const displayGasPrice = (fieldValue: GasPrice) => {
   return displayCoinAsObject({
-    denom: fieldValue.gasPriceDenom as SupportedDenoms,
+    denom: fieldValue.gasPriceDenom as string,
     amount: fieldValue.gasPrice,
   });
 };
