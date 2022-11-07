@@ -112,7 +112,8 @@
     "@tendermint/sig": "0.6.0",
     "date-fns": "^2.29.3",
     "grpc-web": "1.2.0",
-    "secp256k1": "4.0.3"
+    "secp256k1": "4.0.3",
+    "google-protobuf": "^3.21.2"
   },
   "release": {
     "branches": [
