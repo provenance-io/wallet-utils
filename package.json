@@ -113,7 +113,8 @@
     "date-fns": "^2.29.3",
     "grpc-web": "1.2.0",
     "secp256k1": "4.0.3",
-    "ts-pattern": "^4.0.5"
+    "ts-pattern": "^4.0.5",
+    "google-protobuf": "^3.21.2"
   },
   "release": {
     "branches": [
