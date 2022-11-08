@@ -415,13 +415,15 @@ const recurseFormatDisplayValue = (
       typeof value
     );
     const isArrayOfObjects = isMatching(P.array({}), value);
-    const isArrayOfStringsOrNumbers =
-      isMatching(P.array(P.string), value) || isMatching(P.array(P.number), value);
+    const isArrayOfStringsOrNumbersOrBools =
+      isMatching(P.array(P.string), value) ||
+      isMatching(P.array(P.string), value) ||
+      isMatching(P.array(P.boolean), value);
 
     let currentFormattedValue: any;
     try {
       if (isStringOrNumberOrBool) {
-        currentFormattedValue = formatSingleValue(key, value);
+        currentFormattedValue = formatSingleValue(value);
       } else {
         currentFormattedValue = formatCustomObj(key, value);
       }
@@ -437,10 +439,12 @@ const recurseFormatDisplayValue = (
     }
 
     // Arrays are displayed as space delimited single values or recursed again.
-    if (isArrayOfObjects || isArrayOfStringsOrNumbers) {
+    if (isArrayOfObjects || isArrayOfStringsOrNumbersOrBools) {
       // Array is all string/numbers (combine and display)
-      if (isArrayOfStringsOrNumbers) {
-        const currentFieldCombinedValue = value.join(`\n`);
+      if (isArrayOfStringsOrNumbersOrBools) {
+        const currentFieldCombinedValue = value
+          .map((v) => formatSingleValue(v))
+          .join(`\n`);
         parentKey
           ? (finalFlattenedDisplayObject[parentKey][key] = currentFieldCombinedValue)
           : (finalFlattenedDisplayObject[key] = currentFieldCombinedValue);
@@ -487,5 +491,6 @@ export const formatDisplayObject = ({
       {}
     );
   }
+
   return finalMessage;
 };
