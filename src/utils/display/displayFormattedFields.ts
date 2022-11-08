@@ -73,8 +73,8 @@ export const displayDateAndTime = (fieldValue: string) => {
  * function again.
  *
  */
-export const formatSingleValue = (key: string, value: any) =>
-  match({ key, value })
+export const formatSingleValue = (value: any) =>
+  match({ value })
     // True => Yes, False => No
     .with({ value: P.boolean }, () => (value ? 'Yes' : 'No'))
     // Attempt to convert number or string to a Date
@@ -89,7 +89,8 @@ export const formatSingleValue = (key: string, value: any) =>
       {
         value: P.when(
           (str: any) =>
-            str.indexOf('tp') === 0 || (str.indexOf(' ') < 0 && str.length > 30)
+            str.toString().indexOf('tp') === 0 ||
+            (str.toString().indexOf(' ') < 0 && str.length > 30)
         ),
       },
       () => displayAddress(value)
@@ -102,8 +103,7 @@ export const formatSingleValue = (key: string, value: any) =>
       () => displayCapitalizedString(value)
     )
     // Default print as string
-    .with({ value: P.string || P.number }, () => value.toString())
-    .otherwise(() => null);
+    .otherwise(() => value.toString());
 
 /**
  * Deduce the formatting function based on the field and/or value. Value
