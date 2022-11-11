@@ -84,3 +84,17 @@ message QueryDenomHashResponse {
   // hash (in hex format) of the denomination trace information.
   string hash = 1;
 }
+
+// QueryEscrowAddressRequest is the request type for the EscrowAddress RPC method.
+message QueryEscrowAddressRequest {
+  // unique port identifier
+  string port_id = 1;
+  // unique channel identifier
+  string channel_id = 2;
+}
+
+// QueryEscrowAddressResponse is the response type of the EscrowAddress RPC method.
+message QueryEscrowAddressResponse {
+  // the escrow account address
+  string escrow_address = 1;
+}
