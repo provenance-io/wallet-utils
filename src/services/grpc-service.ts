@@ -9,12 +9,18 @@ import {
   CalculateTxFeesRequest,
   CalculateTxFeesResponse,
 } from '../proto/provenance/msgfees/v1/query_pb';
+import {
+  QueryAllBalancesRequest,
+  QueryAllBalancesResponse,
+} from '../proto/cosmos/bank/v1beta1/query_pb';
 import { QueryClient as MsgFeeQueryClient } from '../proto/provenance/msgfees/v1/query_grpc_web_pb';
 import { ServiceClient as TxServiceClient } from '../proto/cosmos/tx/v1beta1/service_grpc_web_pb';
+import { QueryClient as BankQueryClient } from '../proto/cosmos/bank/v1beta1/query_grpc_web_pb';
 import {
   BroadcastTxRequest,
   BroadcastTxResponse,
 } from '../proto/cosmos/tx/v1beta1/service_pb';
+import { PageRequest } from '../proto/cosmos/base/query/v1beta1/pagination_pb';
 
 export const calculateTxFees = (
   serviceAddress: string,
@@ -78,6 +84,36 @@ export const getAccountInfo = (
               });
             } else reject(new Error(`authQuery.account message unpacking failure`));
           } else reject(new Error(`No response from authQuery.account`));
+        }
+      }
+    );
+  });
+};
+
+export const getBalancesList = async (
+  address: string,
+  serviceAddress: string
+): Promise<QueryAllBalancesResponse.AsObject> => {
+  const pageRequest = new PageRequest();
+  pageRequest.setOffset(0);
+  pageRequest.setLimit(1000);
+  pageRequest.setCountTotal(true);
+  const bankRequest = new QueryAllBalancesRequest();
+  bankRequest.setAddress(address);
+  bankRequest.setPagination(pageRequest);
+  return new Promise((resolve, reject) => {
+    new BankQueryClient(serviceAddress, null).allBalances(
+      bankRequest,
+      null,
+      (error: ServerError, response: QueryAllBalancesResponse) => {
+        if (error)
+          reject(
+            new Error(
+              `bankQuery.allBalances error: Code: ${error.code} Message: ${error.message}`
+            )
+          );
+        else {
+          resolve(response.toObject());
         }
       }
     );
