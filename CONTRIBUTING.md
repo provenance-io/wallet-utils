@@ -36,7 +36,7 @@ This GitHub action should automatically run when a PR is merged into the main br
 
 We are using prettier to make our code uniform throughout. Please make sure you have the correct exentions installed, and your code has been formatted before submitting a PR.
 
-The provenance team has implemented [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/). Please take a look at the linked documentation to learn more about conventional commits. This is also how we can automatically version our application. These commits should be in the format: `<type>(<scope>): <subject>`
+The Provenance team has implemented [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/). Please take a look at the linked documentation to learn more about conventional commits. This is also how we can automatically version our application. These commits should be in the format: `<type>(<scope>): <subject>`
 > An example commit could look like this: `docs: spelling error in contributing docs`
 
 Our accepted types include:
