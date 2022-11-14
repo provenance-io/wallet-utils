@@ -26,7 +26,7 @@ npm install
 
 5. Go to [the repository](https://github.com/provenance-io/wallet-utils) and make a Pull Request.
 
-The provenance team is monitoring for pull requests. We will review your pull request and if it is approved, then you may merge it into the requested branch. Please make sure to squash and merge.
+The Provenance team is monitoring for pull requests. We will review your pull request and if it is approved, then you may merge it into the requested branch. Please make sure to squash and merge.
 
 ### Semantic release
 
