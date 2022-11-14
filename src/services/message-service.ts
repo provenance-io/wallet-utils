@@ -18,6 +18,7 @@ import {
   MsgExecuteContractParams,
   MsgFundCommunityPoolDisplay,
   MsgGrantDisplay,
+  MsgRevokeDisplay,
   MsgSendDisplay,
   MsgSetWithdrawAddressDisplay,
   MsgSubmitEvidenceDisplay,
@@ -224,6 +225,7 @@ export const buildMessage = (
     | MsgSendDisplay
     | MsgExecuteContractParams
     | MsgGrantDisplay
+    | MsgRevokeDisplay
     | MsgVerifyInvariantDisplay
     | MsgSetWithdrawAddressDisplay
     | MsgWithdrawDelegatorRewardDisplay

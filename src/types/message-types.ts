@@ -77,7 +77,7 @@ import {
 } from '../proto/cosmos/upgrade/v1beta1/upgrade_pb';
 import { MsgCreateVestingAccount } from '../proto/cosmos/vesting/v1beta1/tx_pb';
 import { Proposal, TextProposal } from '../proto/cosmos/gov/v1beta1/gov_pb';
-import { MsgGrant } from '../proto/cosmos/authz/v1beta1/tx_pb';
+import { MsgGrant, MsgRevoke } from '../proto/cosmos/authz/v1beta1/tx_pb';
 import { Coin } from '../proto/cosmos/base/v1beta1/coin_pb';
 import {
   StoreCodeProposal,
@@ -99,6 +99,7 @@ import { CoinAsObject } from './layout';
 
 export type SupportedMessageTypeNames =
   | 'cosmos.authz.v1beta1.MsgGrant'
+  | 'cosmos.authz.v1beta1.MsgRevoke'
   | 'cosmos.bank.v1beta1.MsgSend'
   | 'cosmos.crisis.v1beta1.MsgVerifyInvariant'
   | 'cosmos.crypto.secp256k1.PubKey'
@@ -174,6 +175,7 @@ export type SupportedMessageTypeNames =
 
 export type ReadableMessageNames =
   | 'MsgGrant'
+  | 'MsgRevoke'
   | 'MsgSend'
   | 'MsgVerifyInvariant'
   | 'PubKey'
@@ -251,6 +253,7 @@ export const TYPE_NAMES_READABLE_MAP: {
   [key in ReadableMessageNames]: SupportedMessageTypeNames;
 } = {
   MsgGrant: 'cosmos.authz.v1beta1.MsgGrant',
+  MsgRevoke: 'cosmos.authz.v1beta1.MsgRevoke',
   MsgSend: 'cosmos.bank.v1beta1.MsgSend',
   MsgVerifyInvariant: 'cosmos.crisis.v1beta1.MsgVerifyInvariant',
   PubKey: 'cosmos.crypto.secp256k1.PubKey',
@@ -369,6 +372,7 @@ export type MsgBeginRedelegateDisplay = MsgBeginRedelegate.AsObject;
 export type MsgUndelegateDisplay = MsgUndelegate.AsObject;
 export type MsgCreateVestingAccountDisplay = MsgCreateVestingAccount.AsObject;
 export type MsgGrantDisplay = MsgGrant.AsObject & { transferLimit: Coin.AsObject };
+export type MsgRevokeDisplay = MsgRevoke.AsObject;
 export type MsgSubmitProposalDisplay = MsgSubmitProposal.AsObject & {
   proposalType:
     | 'TextProposal'
@@ -413,6 +417,7 @@ export type MsgCreateValidatorDisplay = Omit<
 export const MESSAGE_PROTOS: { [key in SupportedMessageTypeNames]: typeof Message } =
   {
     'cosmos.authz.v1beta1.MsgGrant': MsgGrant,
+    'cosmos.authz.v1beta1.MsgRevoke': MsgRevoke,
     'cosmos.bank.v1beta1.MsgSend': MsgSend,
     'cosmos.crisis.v1beta1.MsgVerifyInvariant': MsgVerifyInvariant,
     'cosmos.crypto.secp256k1.PubKey': PubKey,
