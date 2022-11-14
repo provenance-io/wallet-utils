@@ -57,7 +57,7 @@ import {
 import { MsgAddMarkerRequest } from '../proto/provenance/marker/v1/tx_pb';
 import { MarkerStatus, MarkerType } from '../proto/provenance/marker/v1/marker_pb';
 import { Access } from '../proto/provenance/marker/v1/accessgrant_pb';
-import { formatCustomObj, formatSingleValue, getJSType } from '../utils';
+import { formatCustomObj, formatSingleValue } from '../utils';
 import { isMatching, P } from 'ts-pattern';
 
 export type GenericDisplay = { [key: string]: any };
