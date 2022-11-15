@@ -22,6 +22,20 @@ import {
   MsgSendDisplay,
   MsgSetWithdrawAddressDisplay,
   MsgSubmitEvidenceDisplay,
+  MsgCreateGroupDisplay,
+  MsgUpdateGroupMembersDisplay,
+  MsgUpdateGroupAdminDisplay,
+  MsgUpdateGroupMetadataDisplay,
+  MsgCreateGroupPolicyDisplay,
+  MsgUpdateGroupPolicyAdminDisplay,
+  MsgCreateGroupWithPolicyDisplay,
+  MsgUpdateGroupPolicyDecisionPolicyDisplay,
+  MsgUpdateGroupPolicyMetadataDisplay,
+  MsgSubmitGroupProposalDisplay,
+  MsgWithdrawProposalDisplay,
+  MsgGroupVoteDisplay,
+  MsgExecDisplay,
+  MsgLeaveGroupDisplay,
   MsgSubmitProposalDisplay,
   MsgUndelegateDisplay,
   MsgUnjailDisplay,
@@ -243,6 +257,20 @@ export const buildMessage = (
     | MsgBeginRedelegateDisplay
     | MsgUndelegateDisplay
     | MsgCreateVestingAccountDisplay
+    | MsgCreateGroupDisplay
+    | MsgUpdateGroupMembersDisplay
+    | MsgUpdateGroupAdminDisplay
+    | MsgUpdateGroupMetadataDisplay
+    | MsgCreateGroupPolicyDisplay
+    | MsgUpdateGroupPolicyAdminDisplay
+    | MsgCreateGroupWithPolicyDisplay
+    | MsgUpdateGroupPolicyDecisionPolicyDisplay
+    | MsgUpdateGroupPolicyMetadataDisplay
+    | MsgSubmitGroupProposalDisplay
+    | MsgWithdrawProposalDisplay
+    | MsgGroupVoteDisplay
+    | MsgExecDisplay
+    | MsgLeaveGroupDisplay
 ) => {
   switch (type) {
     case 'MsgDelegate': {

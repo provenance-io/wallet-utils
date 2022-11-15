@@ -78,6 +78,22 @@ import {
 import { MsgCreateVestingAccount } from '../proto/cosmos/vesting/v1beta1/tx_pb';
 import { Proposal, TextProposal } from '../proto/cosmos/gov/v1beta1/gov_pb';
 import { MsgGrant, MsgRevoke } from '../proto/cosmos/authz/v1beta1/tx_pb';
+import {
+  MsgCreateGroup,
+  MsgUpdateGroupMembers,
+  MsgUpdateGroupAdmin,
+  MsgUpdateGroupMetadata,
+  MsgCreateGroupPolicy,
+  MsgUpdateGroupPolicyAdmin,
+  MsgCreateGroupWithPolicy,
+  MsgUpdateGroupPolicyDecisionPolicy,
+  MsgUpdateGroupPolicyMetadata,
+  MsgSubmitProposal as MsgSubmitGroupProposal,
+  MsgWithdrawProposal,
+  MsgVote as MsgGroupVote,
+  MsgExec,
+  MsgLeaveGroup,
+} from '../proto/cosmos/group/v1/tx_pb';
 import { Coin } from '../proto/cosmos/base/v1beta1/coin_pb';
 import {
   StoreCodeProposal,
@@ -108,6 +124,20 @@ export type SupportedMessageTypeNames =
   | 'cosmos.distribution.v1beta1.MsgWithdrawDelegatorReward'
   | 'cosmos.distribution.v1beta1.MsgWithdrawValidatorCommission'
   | 'cosmos.evidence.v1beta1.MsgSubmitEvidence'
+  | 'cosmos.group.v1.MsgCreateGroup'
+  | 'cosmos.group.v1.MsgUpdateGroupMembers'
+  | 'cosmos.group.v1.MsgUpdateGroupAdmin'
+  | 'cosmos.group.v1.MsgUpdateGroupMetadata'
+  | 'cosmos.group.v1.MsgCreateGroupPolicy'
+  | 'cosmos.group.v1.MsgUpdateGroupPolicyAdmin'
+  | 'cosmos.group.v1.MsgCreateGroupWithPolicy'
+  | 'cosmos.group.v1.MsgUpdateGroupPolicyDecisionPolicy'
+  | 'cosmos.group.v1.MsgUpdateGroupPolicyMetadata'
+  | 'cosmos.group.v1.MsgSubmitProposal'
+  | 'cosmos.group.v1.MsgWithdrawProposal'
+  | 'cosmos.group.v1.MsgVote'
+  | 'cosmos.group.v1.MsgExec'
+  | 'cosmos.group.v1.MsgLeaveGroup'
   | 'cosmos.gov.v1beta1.MsgDeposit'
   | 'cosmos.gov.v1beta1.MsgSubmitProposal'
   | 'cosmos.gov.v1beta1.MsgVote'
@@ -184,6 +214,20 @@ export type ReadableMessageNames =
   | 'MsgWithdrawDelegatorReward'
   | 'MsgWithdrawValidatorCommission'
   | 'MsgSubmitEvidence'
+  | 'MsgCreateGroup'
+  | 'MsgUpdateGroupMembers'
+  | 'MsgUpdateGroupAdmin'
+  | 'MsgUpdateGroupMetadata'
+  | 'MsgCreateGroupPolicy'
+  | 'MsgUpdateGroupPolicyAdmin'
+  | 'MsgCreateGroupWithPolicy'
+  | 'MsgUpdateGroupPolicyDecisionPolicy'
+  | 'MsgUpdateGroupPolicyMetadata'
+  | 'MsgSubmitGroupProposal'
+  | 'MsgWithdrawProposal'
+  | 'MsgGroupVote'
+  | 'MsgExec'
+  | 'MsgLeaveGroup'
   | 'MsgDeposit'
   | 'MsgSubmitProposal'
   | 'TextProposal'
@@ -264,6 +308,21 @@ export const TYPE_NAMES_READABLE_MAP: {
   MsgWithdrawValidatorCommission:
     'cosmos.distribution.v1beta1.MsgWithdrawValidatorCommission',
   MsgSubmitEvidence: 'cosmos.evidence.v1beta1.MsgSubmitEvidence',
+  MsgCreateGroup: 'cosmos.group.v1.MsgCreateGroup',
+  MsgUpdateGroupMembers: 'cosmos.group.v1.MsgUpdateGroupMembers',
+  MsgUpdateGroupAdmin: 'cosmos.group.v1.MsgUpdateGroupAdmin',
+  MsgUpdateGroupMetadata: 'cosmos.group.v1.MsgUpdateGroupMetadata',
+  MsgCreateGroupPolicy: 'cosmos.group.v1.MsgCreateGroupPolicy',
+  MsgUpdateGroupPolicyAdmin: 'cosmos.group.v1.MsgUpdateGroupPolicyAdmin',
+  MsgCreateGroupWithPolicy: 'cosmos.group.v1.MsgCreateGroupWithPolicy',
+  MsgUpdateGroupPolicyDecisionPolicy:
+    'cosmos.group.v1.MsgUpdateGroupPolicyDecisionPolicy',
+  MsgUpdateGroupPolicyMetadata: 'cosmos.group.v1.MsgUpdateGroupPolicyMetadata',
+  MsgSubmitGroupProposal: 'cosmos.group.v1.MsgSubmitProposal',
+  MsgWithdrawProposal: 'cosmos.group.v1.MsgWithdrawProposal',
+  MsgGroupVote: 'cosmos.group.v1.MsgVote',
+  MsgExec: 'cosmos.group.v1.MsgExec',
+  MsgLeaveGroup: 'cosmos.group.v1.MsgLeaveGroup',
   MsgDeposit: 'cosmos.gov.v1beta1.MsgDeposit',
   MsgSubmitProposal: 'cosmos.gov.v1beta1.MsgSubmitProposal',
   TextProposal: 'cosmos.gov.v1beta1.TextProposal',
@@ -383,6 +442,22 @@ export type MsgSubmitProposalDisplay = MsgSubmitProposal.AsObject & {
     | 'ParameterChangeProposal'
     | undefined;
 };
+export type MsgCreateGroupDisplay = MsgCreateGroup.AsObject;
+export type MsgUpdateGroupMembersDisplay = MsgUpdateGroupMembers.AsObject;
+export type MsgUpdateGroupAdminDisplay = MsgUpdateGroupAdmin.AsObject;
+export type MsgUpdateGroupMetadataDisplay = MsgUpdateGroupMetadata.AsObject;
+export type MsgCreateGroupPolicyDisplay = MsgCreateGroupPolicy.AsObject;
+export type MsgUpdateGroupPolicyAdminDisplay = MsgUpdateGroupPolicyAdmin.AsObject;
+export type MsgCreateGroupWithPolicyDisplay = MsgCreateGroupWithPolicy.AsObject;
+export type MsgUpdateGroupPolicyDecisionPolicyDisplay =
+  MsgUpdateGroupPolicyDecisionPolicy.AsObject;
+export type MsgUpdateGroupPolicyMetadataDisplay =
+  MsgUpdateGroupPolicyMetadata.AsObject;
+export type MsgSubmitGroupProposalDisplay = MsgSubmitGroupProposal.AsObject;
+export type MsgWithdrawProposalDisplay = MsgWithdrawProposal.AsObject;
+export type MsgGroupVoteDisplay = MsgGroupVote.AsObject;
+export type MsgExecDisplay = MsgExec.AsObject;
+export type MsgLeaveGroupDisplay = MsgLeaveGroup.AsObject;
 
 export type AtsMessage = {
   contractType: 'ats';
@@ -428,6 +503,21 @@ export const MESSAGE_PROTOS: { [key in SupportedMessageTypeNames]: typeof Messag
     'cosmos.distribution.v1beta1.MsgWithdrawValidatorCommission':
       MsgWithdrawValidatorCommission,
     'cosmos.evidence.v1beta1.MsgSubmitEvidence': MsgSubmitEvidence,
+    'cosmos.group.v1.MsgCreateGroup': MsgCreateGroup,
+    'cosmos.group.v1.MsgUpdateGroupMembers': MsgUpdateGroupMembers,
+    'cosmos.group.v1.MsgUpdateGroupAdmin': MsgUpdateGroupAdmin,
+    'cosmos.group.v1.MsgUpdateGroupMetadata': MsgUpdateGroupMetadata,
+    'cosmos.group.v1.MsgCreateGroupPolicy': MsgCreateGroupPolicy,
+    'cosmos.group.v1.MsgUpdateGroupPolicyAdmin': MsgUpdateGroupPolicyAdmin,
+    'cosmos.group.v1.MsgCreateGroupWithPolicy': MsgCreateGroupWithPolicy,
+    'cosmos.group.v1.MsgUpdateGroupPolicyDecisionPolicy':
+      MsgUpdateGroupPolicyDecisionPolicy,
+    'cosmos.group.v1.MsgUpdateGroupPolicyMetadata': MsgUpdateGroupPolicyMetadata,
+    'cosmos.group.v1.MsgSubmitProposal': MsgSubmitGroupProposal,
+    'cosmos.group.v1.MsgWithdrawProposal': MsgWithdrawProposal,
+    'cosmos.group.v1.MsgVote': MsgGroupVote,
+    'cosmos.group.v1.MsgExec': MsgExec,
+    'cosmos.group.v1.MsgLeaveGroup': MsgLeaveGroup,
     'cosmos.gov.v1beta1.MsgDeposit': MsgDeposit,
     'cosmos.gov.v1beta1.MsgSubmitProposal': MsgSubmitProposal,
     'cosmos.gov.v1beta1.MsgVote': MsgVote,
