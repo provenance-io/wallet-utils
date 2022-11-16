@@ -18,9 +18,9 @@ import {
   QueryGroupsByMemberResponse,
   QueryGroupsByAdminRequest,
   QueryGroupsByAdminResponse,
-} from '../proto/cosmos/group/v1/query_pb';
-import { QueryClient as GroupQueryClient } from '../proto/cosmos/group/v1/query_grpc_web_pb';
-import { PageRequest } from '../proto/cosmos/base/query/v1beta1/pagination_pb';
+} from '../../proto/cosmos/group/v1/query_pb';
+import { QueryClient as GroupQueryClient } from '../../proto/cosmos/group/v1/query_grpc_web_pb';
+import { PageRequest } from '../../proto/cosmos/base/query/v1beta1/pagination_pb';
 
 export const getGroupInfo = async (
   serviceAddress: string,
