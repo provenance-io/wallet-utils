@@ -1,2 +1,2 @@
-export * from './grpc-service';
+export * from './grpc';
 export * from './message-service';

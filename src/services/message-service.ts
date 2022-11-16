@@ -22,6 +22,20 @@ import {
   MsgSendDisplay,
   MsgSetWithdrawAddressDisplay,
   MsgSubmitEvidenceDisplay,
+  MsgCreateGroupDisplay,
+  MsgUpdateGroupMembersDisplay,
+  MsgUpdateGroupAdminDisplay,
+  MsgUpdateGroupMetadataDisplay,
+  MsgCreateGroupPolicyDisplay,
+  MsgUpdateGroupPolicyAdminDisplay,
+  MsgCreateGroupWithPolicyDisplay,
+  MsgUpdateGroupPolicyDecisionPolicyDisplay,
+  MsgUpdateGroupPolicyMetadataDisplay,
+  MsgSubmitGroupProposalDisplay,
+  MsgWithdrawProposalDisplay,
+  MsgGroupVoteDisplay,
+  MsgExecDisplay,
+  MsgLeaveGroupDisplay,
   MsgSubmitProposalDisplay,
   MsgUndelegateDisplay,
   MsgUnjailDisplay,
@@ -59,6 +73,8 @@ import { MarkerStatus, MarkerType } from '../proto/provenance/marker/v1/marker_p
 import { Access } from '../proto/provenance/marker/v1/accessgrant_pb';
 import { formatCustomObj, formatSingleValue } from '../utils';
 import { isMatching, P } from 'ts-pattern';
+import { MsgCreateGroup } from '../proto/cosmos/group/v1/tx_pb';
+import { MemberRequest } from '../proto/cosmos/group/v1/types_pb';
 
 export type GenericDisplay = { [key: string]: any };
 
@@ -243,6 +259,20 @@ export const buildMessage = (
     | MsgBeginRedelegateDisplay
     | MsgUndelegateDisplay
     | MsgCreateVestingAccountDisplay
+    | MsgCreateGroupDisplay
+    | MsgUpdateGroupMembersDisplay
+    | MsgUpdateGroupAdminDisplay
+    | MsgUpdateGroupMetadataDisplay
+    | MsgCreateGroupPolicyDisplay
+    | MsgUpdateGroupPolicyAdminDisplay
+    | MsgCreateGroupWithPolicyDisplay
+    | MsgUpdateGroupPolicyDecisionPolicyDisplay
+    | MsgUpdateGroupPolicyMetadataDisplay
+    | MsgSubmitGroupProposalDisplay
+    | MsgWithdrawProposalDisplay
+    | MsgGroupVoteDisplay
+    | MsgExecDisplay
+    | MsgLeaveGroupDisplay
 ) => {
   switch (type) {
     case 'MsgDelegate': {
@@ -268,6 +298,22 @@ export const buildMessage = (
         msgSend.addAmount(new Coin().setAmount(`${amount}`).setDenom(denom));
       });
       return msgSend;
+    }
+
+    case 'MsgCreateGroup': {
+      const { admin, membersList, metadata } = params as MsgCreateGroupDisplay;
+      const msgCreateGroup = new MsgCreateGroup()
+        .setAdmin(admin)
+        .setMetadata(metadata);
+      membersList.forEach(({ address, weight, metadata }) => {
+        msgCreateGroup.addMembers(
+          new MemberRequest()
+            .setAddress(address)
+            .setWeight(weight)
+            .setMetadata(metadata)
+        );
+      });
+      return msgCreateGroup;
     }
 
     case 'MsgExecuteContract': {

@@ -1,26 +1,26 @@
 import { Error as ServerError } from 'grpc-web';
-import { BaseAccount } from '../proto/cosmos/auth/v1beta1/auth_pb';
+import { BaseAccount } from '../../proto/cosmos/auth/v1beta1/auth_pb';
 import {
   QueryAccountRequest,
   QueryAccountResponse,
-} from '../proto/cosmos/auth/v1beta1/query_pb';
-import { QueryClient as AuthQueryClient } from '../proto/cosmos/auth/v1beta1/query_grpc_web_pb';
+} from '../../proto/cosmos/auth/v1beta1/query_pb';
+import { QueryClient as AuthQueryClient } from '../../proto/cosmos/auth/v1beta1/query_grpc_web_pb';
 import {
   CalculateTxFeesRequest,
   CalculateTxFeesResponse,
-} from '../proto/provenance/msgfees/v1/query_pb';
+} from '../../proto/provenance/msgfees/v1/query_pb';
 import {
   QueryAllBalancesRequest,
   QueryAllBalancesResponse,
-} from '../proto/cosmos/bank/v1beta1/query_pb';
-import { QueryClient as MsgFeeQueryClient } from '../proto/provenance/msgfees/v1/query_grpc_web_pb';
-import { ServiceClient as TxServiceClient } from '../proto/cosmos/tx/v1beta1/service_grpc_web_pb';
-import { QueryClient as BankQueryClient } from '../proto/cosmos/bank/v1beta1/query_grpc_web_pb';
+} from '../../proto/cosmos/bank/v1beta1/query_pb';
+import { QueryClient as MsgFeeQueryClient } from '../../proto/provenance/msgfees/v1/query_grpc_web_pb';
+import { ServiceClient as TxServiceClient } from '../../proto/cosmos/tx/v1beta1/service_grpc_web_pb';
+import { QueryClient as BankQueryClient } from '../../proto/cosmos/bank/v1beta1/query_grpc_web_pb';
 import {
   BroadcastTxRequest,
   BroadcastTxResponse,
-} from '../proto/cosmos/tx/v1beta1/service_pb';
-import { PageRequest } from '../proto/cosmos/base/query/v1beta1/pagination_pb';
+} from '../../proto/cosmos/tx/v1beta1/service_pb';
+import { PageRequest } from '../../proto/cosmos/base/query/v1beta1/pagination_pb';
 
 export const calculateTxFees = (
   serviceAddress: string,
