@@ -379,8 +379,8 @@ interface buildBroadcastTxRequestProps {
   memo: string;
   feeDenom: string;
   gasLimit: number;
-  feeGranter: string;
-  feePayer: string;
+  feeGranter?: string;
+  feePayer?: string;
 }
 
 export const buildBroadcastTxRequest = ({
