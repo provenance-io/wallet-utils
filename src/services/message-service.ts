@@ -86,12 +86,23 @@ export type MsgExecuteContractDisplay = {
 
 export type FallbackGenericMessageName = 'MsgGeneric' | 'MsgExecuteContractGeneric';
 
-export const buildAuthInfo = (
-  signerInfo: SignerInfo,
-  feeDenom: string,
-  feeEstimate: CoinAsObject[] = [],
-  gasLimit: number
-): AuthInfo => {
+interface BuildAuthInfo {
+  signerInfo: SignerInfo;
+  feeDenom: string;
+  feeEstimate?: CoinAsObject[];
+  gasLimit: number;
+  feePayer?: string;
+  feeGranter?: string;
+}
+
+export const buildAuthInfo = ({
+  signerInfo,
+  feeDenom,
+  feeEstimate = [],
+  gasLimit,
+  feePayer,
+  feeGranter,
+}: BuildAuthInfo): AuthInfo => {
   //
   // TODO: Move feeList into it's own function and add unit tests
   //
@@ -137,6 +148,8 @@ export const buildAuthInfo = (
   const fee = new Fee();
   fee.setAmountList(feeList);
   fee.setGasLimit(gasLimit);
+  if (feePayer) fee.setPayer(feePayer);
+  if (feeGranter) fee.setGranter(feeGranter);
   const authInfo = new AuthInfo();
   authInfo.setFee(fee);
   authInfo.setSignerInfosList([signerInfo].filter((f) => f));
@@ -207,6 +220,8 @@ interface CalculateTxFeesRequestParams {
   gasPriceDenom?: string;
   gasLimit: number;
   gasAdjustment?: number;
+  feeGranter?: string;
+  feePayer?: string;
 }
 
 export const buildCalculateTxFeeRequest = ({
@@ -216,9 +231,17 @@ export const buildCalculateTxFeeRequest = ({
   gasPriceDenom = 'nhash',
   gasLimit,
   gasAdjustment = 1.25,
+  feeGranter,
+  feePayer,
 }: CalculateTxFeesRequestParams): CalculateTxFeesRequest => {
   const signerInfo = buildSignerInfo(account, publicKey);
-  const authInfo = buildAuthInfo(signerInfo, gasPriceDenom, undefined, gasLimit);
+  const authInfo = buildAuthInfo({
+    signerInfo,
+    feeDenom: gasPriceDenom,
+    gasLimit,
+    feeGranter,
+    feePayer,
+  });
   const txBody = buildTxBody(msgAny);
   const txRaw = new TxRaw();
   txRaw.setBodyBytes(txBody.serializeBinary());
@@ -356,6 +379,8 @@ interface buildBroadcastTxRequestProps {
   memo: string;
   feeDenom: string;
   gasLimit: number;
+  feeGranter: string;
+  feePayer: string;
 }
 
 export const buildBroadcastTxRequest = ({
@@ -367,9 +392,18 @@ export const buildBroadcastTxRequest = ({
   memo = '',
   feeDenom = 'nhash',
   gasLimit,
+  feeGranter,
+  feePayer,
 }: buildBroadcastTxRequestProps): BroadcastTxRequest => {
   const signerInfo = buildSignerInfo(account, wallet.publicKey);
-  const authInfo = buildAuthInfo(signerInfo, feeDenom, feeEstimate, gasLimit);
+  const authInfo = buildAuthInfo({
+    signerInfo,
+    feeDenom,
+    feeEstimate,
+    gasLimit,
+    feeGranter,
+    feePayer,
+  });
   const txBody = buildTxBody(msgAny, memo);
   const txRaw = new TxRaw();
   txRaw.setBodyBytes(txBody.serializeBinary());
