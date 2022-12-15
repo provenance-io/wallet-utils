@@ -90,7 +90,9 @@ export const buildAuthInfo = (
   signerInfo: SignerInfo,
   feeDenom: string,
   feeEstimate: CoinAsObject[] = [],
-  gasLimit: number
+  gasLimit: number,
+  feePayer?: string,
+  feeGranter?: string
 ): AuthInfo => {
   //
   // TODO: Move feeList into it's own function and add unit tests
@@ -137,6 +139,8 @@ export const buildAuthInfo = (
   const fee = new Fee();
   fee.setAmountList(feeList);
   fee.setGasLimit(gasLimit);
+  if (feePayer) fee.setPayer(feePayer);
+  if (feeGranter) fee.setGranter(feeGranter);
   const authInfo = new AuthInfo();
   authInfo.setFee(fee);
   authInfo.setSignerInfosList([signerInfo].filter((f) => f));
