@@ -175,14 +175,28 @@ export const buildSignerInfo = (
   return signerInfo;
 };
 
-export const buildTxBody = (
-  msgAny: google_protobuf_any_pb.Any | google_protobuf_any_pb.Any[],
-  memo: string = ''
-): TxBody => {
+interface BuildTxBodyProps {
+  msgAny: google_protobuf_any_pb.Any | google_protobuf_any_pb.Any[];
+  extensionOptionsList?: google_protobuf_any_pb.Any[];
+  nonCriticalExtensionOptionsList?: google_protobuf_any_pb.Any[];
+  memo?: string;
+  timeoutHeight?: number;
+}
+export const buildTxBody = ({
+  msgAny,
+  memo = '',
+  timeoutHeight,
+  extensionOptionsList,
+  nonCriticalExtensionOptionsList,
+}: BuildTxBodyProps): TxBody => {
   const txBody = new TxBody();
   if (Array.isArray(msgAny)) txBody.setMessagesList(msgAny);
   else txBody.addMessages(msgAny);
   txBody.setMemo(memo);
+  if (timeoutHeight) txBody.setTimeoutHeight(timeoutHeight);
+  if (extensionOptionsList) txBody.setExtensionOptionsList(extensionOptionsList);
+  if (nonCriticalExtensionOptionsList)
+    txBody.setNonCriticalExtensionOptionsList(nonCriticalExtensionOptionsList);
   return txBody;
 };
 
@@ -213,8 +227,7 @@ export const signBytes = (bytes: Uint8Array, privateKey: Bytes): Uint8Array => {
   return signature;
 };
 
-interface CalculateTxFeesRequestParams {
-  msgAny: google_protobuf_any_pb.Any | google_protobuf_any_pb.Any[];
+type CalculateTxFeesRequestParams = BuildTxBodyProps & {
   account: BaseAccount;
   publicKey: Bytes;
   gasPriceDenom?: string;
@@ -222,7 +235,7 @@ interface CalculateTxFeesRequestParams {
   gasAdjustment?: number;
   feeGranter?: string;
   feePayer?: string;
-}
+};
 
 export const buildCalculateTxFeeRequest = ({
   msgAny,
@@ -233,6 +246,10 @@ export const buildCalculateTxFeeRequest = ({
   gasAdjustment = 1.25,
   feeGranter,
   feePayer,
+  memo,
+  timeoutHeight,
+  extensionOptionsList,
+  nonCriticalExtensionOptionsList,
 }: CalculateTxFeesRequestParams): CalculateTxFeesRequest => {
   const signerInfo = buildSignerInfo(account, publicKey);
   const authInfo = buildAuthInfo({
@@ -242,7 +259,13 @@ export const buildCalculateTxFeeRequest = ({
     feeGranter,
     feePayer,
   });
-  const txBody = buildTxBody(msgAny);
+  const txBody = buildTxBody({
+    msgAny,
+    memo,
+    timeoutHeight,
+    extensionOptionsList,
+    nonCriticalExtensionOptionsList,
+  });
   const txRaw = new TxRaw();
   txRaw.setBodyBytes(txBody.serializeBinary());
   txRaw.setAuthInfoBytes(authInfo.serializeBinary());
@@ -370,18 +393,19 @@ export const msgAnyB64toAny = (msgAnyB64: string): google_protobuf_any_pb.Any =>
   return google_protobuf_any_pb.Any.deserializeBinary(base64ToBytes(msgAnyB64));
 };
 
-interface buildBroadcastTxRequestProps {
-  msgAny: google_protobuf_any_pb.Any | google_protobuf_any_pb.Any[];
+type BuildBroadcastTxRequestProps = BuildTxBodyProps & {
   account: BaseAccount;
+  publicKey: Bytes;
+  gasPriceDenom?: string;
+  gasLimit: number;
+  gasAdjustment?: number;
+  feeGranter?: string;
+  feePayer?: string;
   chainId: string;
   wallet: Wallet;
   feeEstimate: CoinAsObject[];
-  memo: string;
   feeDenom: string;
-  gasLimit: number;
-  feeGranter?: string;
-  feePayer?: string;
-}
+};
 
 export const buildBroadcastTxRequest = ({
   msgAny,
@@ -394,7 +418,10 @@ export const buildBroadcastTxRequest = ({
   gasLimit,
   feeGranter,
   feePayer,
-}: buildBroadcastTxRequestProps): BroadcastTxRequest => {
+  timeoutHeight,
+  extensionOptionsList,
+  nonCriticalExtensionOptionsList,
+}: BuildBroadcastTxRequestProps): BroadcastTxRequest => {
   const signerInfo = buildSignerInfo(account, wallet.publicKey);
   const authInfo = buildAuthInfo({
     signerInfo,
@@ -404,7 +431,13 @@ export const buildBroadcastTxRequest = ({
     feeGranter,
     feePayer,
   });
-  const txBody = buildTxBody(msgAny, memo);
+  const txBody = buildTxBody({
+    msgAny,
+    memo,
+    timeoutHeight,
+    extensionOptionsList,
+    nonCriticalExtensionOptionsList,
+  });
   const txRaw = new TxRaw();
   txRaw.setBodyBytes(txBody.serializeBinary());
   txRaw.setAuthInfoBytes(authInfo.serializeBinary());
