@@ -395,7 +395,6 @@ export const msgAnyB64toAny = (msgAnyB64: string): google_protobuf_any_pb.Any =>
 
 type BuildBroadcastTxRequestProps = BuildTxBodyProps & {
   account: BaseAccount;
-  publicKey: Bytes;
   gasPriceDenom?: string;
   gasLimit: number;
   gasAdjustment?: number;
