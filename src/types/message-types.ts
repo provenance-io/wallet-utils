@@ -61,7 +61,7 @@ import {
   MsgVoteWeighted,
   MsgDeposit,
   MsgSubmitProposal,
-} from '../proto/cosmos/gov/v1beta1/tx_pb';
+} from '../proto/cosmos/gov/v1/tx_pb';
 import { MsgUnjail } from '../proto/cosmos/slashing/v1beta1/tx_pb';
 import {
   MsgEditValidator,
@@ -76,7 +76,8 @@ import {
   Plan,
 } from '../proto/cosmos/upgrade/v1beta1/upgrade_pb';
 import { MsgCreateVestingAccount } from '../proto/cosmos/vesting/v1beta1/tx_pb';
-import { Proposal, TextProposal } from '../proto/cosmos/gov/v1beta1/gov_pb';
+import { TextProposal } from '../proto/cosmos/gov/v1beta1/gov_pb';
+import { Proposal } from '../proto/cosmos/gov/v1/gov_pb';
 import { MsgGrant, MsgRevoke } from '../proto/cosmos/authz/v1beta1/tx_pb';
 import {
   MsgCreateGroup,
@@ -138,11 +139,11 @@ export type SupportedMessageTypeNames =
   | 'cosmos.group.v1.MsgVote'
   | 'cosmos.group.v1.MsgExec'
   | 'cosmos.group.v1.MsgLeaveGroup'
-  | 'cosmos.gov.v1beta1.MsgDeposit'
-  | 'cosmos.gov.v1beta1.MsgSubmitProposal'
-  | 'cosmos.gov.v1beta1.MsgVote'
-  | 'cosmos.gov.v1beta1.MsgVoteWeighted'
-  | 'cosmos.gov.v1beta1.Proposal'
+  | 'cosmos.gov.v1.MsgDeposit'
+  | 'cosmos.gov.v1.MsgSubmitProposal'
+  | 'cosmos.gov.v1.MsgVote'
+  | 'cosmos.gov.v1.MsgVoteWeighted'
+  | 'cosmos.gov.v1.Proposal'
   | 'cosmos.gov.v1beta1.TextProposal'
   | 'cosmos.params.v1beta1.ParamChange'
   | 'cosmos.params.v1beta1.ParameterChangeProposal'
@@ -323,8 +324,8 @@ export const TYPE_NAMES_READABLE_MAP: {
   MsgGroupVote: 'cosmos.group.v1.MsgVote',
   MsgExec: 'cosmos.group.v1.MsgExec',
   MsgLeaveGroup: 'cosmos.group.v1.MsgLeaveGroup',
-  MsgDeposit: 'cosmos.gov.v1beta1.MsgDeposit',
-  MsgSubmitProposal: 'cosmos.gov.v1beta1.MsgSubmitProposal',
+  MsgDeposit: 'cosmos.gov.v1.MsgDeposit',
+  MsgSubmitProposal: 'cosmos.gov.v1.MsgSubmitProposal',
   TextProposal: 'cosmos.gov.v1beta1.TextProposal',
   SoftwareUpgradeProposal: 'cosmos.upgrade.v1beta1.SoftwareUpgradeProposal',
   CancelSoftwareUpgradeProposal:
@@ -335,9 +336,9 @@ export const TYPE_NAMES_READABLE_MAP: {
   AccessConfig: 'cosmwasm.wasm.v1.AccessConfig',
   ParameterChangeProposal: 'cosmos.params.v1beta1.ParameterChangeProposal',
   ParamChange: 'cosmos.params.v1beta1.ParamChange',
-  MsgVote: 'cosmos.gov.v1beta1.MsgVote',
-  MsgVoteWeighted: 'cosmos.gov.v1beta1.MsgVoteWeighted',
-  Proposal: 'cosmos.gov.v1beta1.Proposal',
+  MsgVote: 'cosmos.gov.v1.MsgVote',
+  MsgVoteWeighted: 'cosmos.gov.v1.MsgVoteWeighted',
+  Proposal: 'cosmos.gov.v1.Proposal',
   MsgUnjail: 'cosmos.slashing.v1beta1.MsgUnjail',
   MsgBeginRedelegate: 'cosmos.staking.v1beta1.MsgBeginRedelegate',
   MsgCreateValidator: 'cosmos.staking.v1beta1.MsgCreateValidator',
@@ -432,16 +433,7 @@ export type MsgUndelegateDisplay = MsgUndelegate.AsObject;
 export type MsgCreateVestingAccountDisplay = MsgCreateVestingAccount.AsObject;
 export type MsgGrantDisplay = MsgGrant.AsObject & { transferLimit: Coin.AsObject };
 export type MsgRevokeDisplay = MsgRevoke.AsObject;
-export type MsgSubmitProposalDisplay = MsgSubmitProposal.AsObject & {
-  proposalType:
-    | 'TextProposal'
-    | 'SoftwareUpgradeProposal'
-    | 'CancelSoftwareUpgradeProposal'
-    | 'StoreCodeProposal'
-    | 'InstantiateCodeProposal'
-    | 'ParameterChangeProposal'
-    | undefined;
-};
+export type MsgSubmitProposalDisplay = MsgSubmitProposal.AsObject;
 export type MsgCreateGroupDisplay = MsgCreateGroup.AsObject;
 export type MsgUpdateGroupMembersDisplay = MsgUpdateGroupMembers.AsObject;
 export type MsgUpdateGroupAdminDisplay = MsgUpdateGroupAdmin.AsObject;
@@ -518,10 +510,10 @@ export const MESSAGE_PROTOS: { [key in SupportedMessageTypeNames]: typeof Messag
     'cosmos.group.v1.MsgVote': MsgGroupVote,
     'cosmos.group.v1.MsgExec': MsgExec,
     'cosmos.group.v1.MsgLeaveGroup': MsgLeaveGroup,
-    'cosmos.gov.v1beta1.MsgDeposit': MsgDeposit,
-    'cosmos.gov.v1beta1.MsgSubmitProposal': MsgSubmitProposal,
-    'cosmos.gov.v1beta1.MsgVote': MsgVote,
-    'cosmos.gov.v1beta1.Proposal': Proposal,
+    'cosmos.gov.v1.MsgDeposit': MsgDeposit,
+    'cosmos.gov.v1.MsgSubmitProposal': MsgSubmitProposal,
+    'cosmos.gov.v1.MsgVote': MsgVote,
+    'cosmos.gov.v1.Proposal': Proposal,
     'cosmos.gov.v1beta1.TextProposal': TextProposal,
     'cosmos.params.v1beta1.ParamChange': ParamChange,
     'cosmos.params.v1beta1.ParameterChangeProposal': ParameterChangeProposal,
@@ -540,7 +532,7 @@ export const MESSAGE_PROTOS: { [key in SupportedMessageTypeNames]: typeof Messag
     'cosmwasm.wasm.v1.InstantiateCodeProposal': InstantiateContractProposal,
     'cosmwasm.wasm.v1.MsgExecuteContract': MsgExecuteContract,
     'cosmwasm.wasm.v1.StoreCodeProposal': StoreCodeProposal,
-    'cosmos.gov.v1beta1.MsgVoteWeighted': MsgVoteWeighted,
+    'cosmos.gov.v1.MsgVoteWeighted': MsgVoteWeighted,
     'provenance.attribute.v1.MsgAddAttributeRequest': MsgAddAttributeRequest,
     'provenance.attribute.v1.MsgDeleteAttributeRequest': MsgDeleteAttributeRequest,
     'provenance.attribute.v1.MsgDeleteDistinctAttributeRequest':

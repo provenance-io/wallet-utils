@@ -75,6 +75,7 @@ import { formatCustomObj, formatSingleValue } from '../utils';
 import { isMatching, P } from 'ts-pattern';
 import { MsgCreateGroup } from '../proto/cosmos/group/v1/tx_pb';
 import { MemberRequest } from '../proto/cosmos/group/v1/types_pb';
+import { MsgSubmitProposal } from 'proto/cosmos/gov/v1/tx_pb';
 
 export type GenericDisplay = { [key: string]: any };
 
@@ -457,7 +458,12 @@ export const buildBroadcastTxRequest = ({
  */
 export const unpackDisplayObjectFromWalletMessage = (
   anyMsgBase64: string
-): (MsgSendDisplay | MsgExecuteContractDisplay | GenericDisplay) & {
+): (
+  | MsgSendDisplay
+  | MsgExecuteContractDisplay
+  | MsgSubmitProposalDisplay
+  | GenericDisplay
+) & {
   typeName: ReadableMessageNames | FallbackGenericMessageName;
 } => {
   const msgBytes = base64ToBytes(anyMsgBase64);
@@ -509,6 +515,13 @@ export const unpackDisplayObjectFromWalletMessage = (
               };
             }),
         };
+      case 'cosmos.gov.v1.MsgSubmitProposal': {
+        const msgContent = message as MsgSubmitProposal;
+        return {
+          typeName: 'MsgSubmitProposal',
+          ...(message as MsgSubmitProposal).toObject(),
+        };
+      }
       default:
         return {
           typeName: 'MsgGeneric',
