@@ -61,6 +61,7 @@ import {
   MsgVoteWeighted,
   MsgDeposit,
   MsgSubmitProposal,
+  MsgExecLegacyContent,
 } from '../proto/cosmos/gov/v1/tx_pb';
 import { MsgUnjail } from '../proto/cosmos/slashing/v1beta1/tx_pb';
 import {
@@ -140,6 +141,7 @@ export type SupportedMessageTypeNames =
   | 'cosmos.group.v1.MsgExec'
   | 'cosmos.group.v1.MsgLeaveGroup'
   | 'cosmos.gov.v1.MsgDeposit'
+  | 'cosmos.gov.v1.MsgExecLegacyContent'
   | 'cosmos.gov.v1.MsgSubmitProposal'
   | 'cosmos.gov.v1.MsgVote'
   | 'cosmos.gov.v1.MsgVoteWeighted'
@@ -230,6 +232,7 @@ export type ReadableMessageNames =
   | 'MsgExec'
   | 'MsgLeaveGroup'
   | 'MsgDeposit'
+  | 'MsgExecLegacyContent'
   | 'MsgSubmitProposal'
   | 'TextProposal'
   | 'SoftwareUpgradeProposal'
@@ -325,6 +328,7 @@ export const TYPE_NAMES_READABLE_MAP: {
   MsgExec: 'cosmos.group.v1.MsgExec',
   MsgLeaveGroup: 'cosmos.group.v1.MsgLeaveGroup',
   MsgDeposit: 'cosmos.gov.v1.MsgDeposit',
+  MsgExecLegacyContent: 'cosmos.gov.v1.MsgExecLegacyContent',
   MsgSubmitProposal: 'cosmos.gov.v1.MsgSubmitProposal',
   TextProposal: 'cosmos.gov.v1beta1.TextProposal',
   SoftwareUpgradeProposal: 'cosmos.upgrade.v1beta1.SoftwareUpgradeProposal',
@@ -411,6 +415,7 @@ export type MsgWithdrawDelegatorRewardDisplay = MsgWithdrawDelegatorReward.AsObj
 export type MsgWithdrawValidatorCommissionDisplay =
   MsgWithdrawValidatorCommission.AsObject;
 export type MsgFundCommunityPoolDisplay = MsgFundCommunityPool.AsObject;
+export type MsgExecLegacyContentDisplay = MsgExecLegacyContent.AsObject;
 export type TextProposalDisplay = TextProposal.AsObject;
 export type SoftwareUpgradeProposalDisplay = SoftwareUpgradeProposal.AsObject;
 export type CancelSoftwareUpgradeProposalDisplay =
@@ -511,6 +516,7 @@ export const MESSAGE_PROTOS: { [key in SupportedMessageTypeNames]: typeof Messag
     'cosmos.group.v1.MsgExec': MsgExec,
     'cosmos.group.v1.MsgLeaveGroup': MsgLeaveGroup,
     'cosmos.gov.v1.MsgDeposit': MsgDeposit,
+    'cosmos.gov.v1.MsgExecLegacyContent': MsgExecLegacyContent,
     'cosmos.gov.v1.MsgSubmitProposal': MsgSubmitProposal,
     'cosmos.gov.v1.MsgVote': MsgVote,
     'cosmos.gov.v1.Proposal': Proposal,
