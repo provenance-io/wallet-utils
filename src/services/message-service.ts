@@ -518,7 +518,7 @@ export const unpackDisplayObjectFromWalletMessage = (
           voter: content.getVoter(),
           optionsList: content.getOptionsList().map((item) => ({
             option: voteOptions[item.getOption()],
-            // Convert number to a percent
+            // Convert weight to a percent
             weight: `${Number(item.getWeight()) * 100}%`,
           })),
         };
