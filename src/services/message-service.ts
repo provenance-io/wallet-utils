@@ -1,6 +1,6 @@
 import * as google_protobuf_any_pb from 'google-protobuf/google/protobuf/any_pb';
 import { Message } from 'google-protobuf';
-import type { Wallet } from '@tendermint/sig';
+import type { Msg, Wallet } from '@tendermint/sig';
 import type { Bytes } from '@tendermint/types';
 import { base64ToBytes, bufferToBytes, bytesToBase64 } from '@tendermint/belt';
 import { MsgExecuteContract } from '../proto/cosmwasm/wasm/v1/tx_pb';
@@ -75,6 +75,24 @@ import { formatCustomObj, formatSingleValue } from '../utils';
 import { isMatching, P } from 'ts-pattern';
 import { MsgCreateGroup } from '../proto/cosmos/group/v1/tx_pb';
 import { MemberRequest } from '../proto/cosmos/group/v1/types_pb';
+import {
+  MsgExecLegacyContent,
+  MsgSubmitProposal,
+  MsgVote,
+  MsgVoteWeighted,
+} from '../proto/cosmos/gov/v1/tx_pb';
+import { TextProposal } from '../proto/cosmos/gov/v1beta1/gov_pb';
+import {
+  CancelSoftwareUpgradeProposal,
+  SoftwareUpgradeProposal,
+} from '../proto/cosmos/upgrade/v1beta1/upgrade_pb';
+import {
+  StoreCodeProposal,
+  InstantiateContractProposal,
+} from '../proto/cosmwasm/wasm/v1/proposal_pb';
+import { AccessType } from '../proto/cosmwasm/wasm/v1/types_pb';
+import { ParameterChangeProposal } from '../proto/cosmos/params/v1beta1/params_pb';
+import { VoteOption } from '../proto/cosmos/gov/v1/gov_pb';
 
 export type GenericDisplay = { [key: string]: any };
 
@@ -457,7 +475,12 @@ export const buildBroadcastTxRequest = ({
  */
 export const unpackDisplayObjectFromWalletMessage = (
   anyMsgBase64: string
-): (MsgSendDisplay | MsgExecuteContractDisplay | GenericDisplay) & {
+): (
+  | MsgSendDisplay
+  | MsgExecuteContractDisplay
+  | MsgSubmitProposalDisplay
+  | GenericDisplay
+) & {
   typeName: ReadableMessageNames | FallbackGenericMessageName;
 } => {
   const msgBytes = base64ToBytes(anyMsgBase64);
@@ -474,6 +497,32 @@ export const unpackDisplayObjectFromWalletMessage = (
           typeName: 'MsgSend',
           ...(message as MsgSend).toObject(),
         };
+      case 'cosmos.gov.v1.MsgVote': {
+        const content = message as MsgVote;
+        // Create a readable version of the Vote Option Enum
+        const voteOptions = Object.keys(VoteOption).map((option) => option);
+        return {
+          typeName: 'MsgVote',
+          proposalId: content.getProposalId(),
+          voter: content.getVoter(),
+          option: voteOptions[content.getOption()],
+        };
+      }
+      case 'cosmos.gov.v1.MsgVoteWeighted': {
+        const content = message as MsgVoteWeighted;
+        // Create a readable version of the Vote Option Enum
+        const voteOptions = Object.keys(VoteOption).map((option) => option);
+        return {
+          typeName: 'MsgVoteWeighted',
+          proposalId: content.getProposalId(),
+          voter: content.getVoter(),
+          optionsList: content.getOptionsList().map((item) => ({
+            option: voteOptions[item.getOption()],
+            // Convert weight to a percent
+            weight: `${Number(item.getWeight()) * 100}%`,
+          })),
+        };
+      }
       case 'cosmwasm.wasm.v1.MsgExecuteContract':
         return {
           typeName: 'MsgExecuteContractGeneric',
@@ -509,6 +558,148 @@ export const unpackDisplayObjectFromWalletMessage = (
               };
             }),
         };
+      case 'cosmos.gov.v1.MsgSubmitProposal': {
+        const msgContent = message as MsgSubmitProposal;
+        const messagesList = msgContent.getMessagesList();
+        const depositList = msgContent.getInitialDepositList();
+        return {
+          typeName: 'MsgSubmitProposal',
+          proposer: msgContent.getProposer(),
+          // If no deposits, show a 0 value
+          initialDepositList:
+            depositList.length > 0
+              ? depositList.map((coin) => ({
+                  denom: coin.getDenom(),
+                  amount: coin.getAmount(),
+                }))
+              : { denom: 'nhash', amount: '0' },
+          messages: messagesList.map((msg) => {
+            const typeName = msg.getTypeName() as SupportedMessageTypeNames;
+            // Check if the msg type is legacy content
+            if (typeName === 'cosmos.gov.v1.MsgExecLegacyContent') {
+              const unpackedMsg = msg.unpack(
+                MESSAGE_PROTOS[typeName].deserializeBinary,
+                typeName
+              );
+              const subMessage = (unpackedMsg as MsgExecLegacyContent).getContent();
+              const subMessageTypeName =
+                subMessage?.getTypeName() as SupportedMessageTypeNames;
+              if (MESSAGE_PROTOS[subMessageTypeName]) {
+                const msgContent = subMessage?.unpack(
+                  MESSAGE_PROTOS[subMessageTypeName].deserializeBinary,
+                  subMessageTypeName
+                );
+                switch (subMessageTypeName) {
+                  case 'cosmos.gov.v1beta1.TextProposal': {
+                    const content = msgContent as TextProposal;
+                    return {
+                      proposalType: 'Text Proposal',
+                      title: content.getTitle(),
+                      description: content.getDescription(),
+                    };
+                  }
+                  case 'cosmos.upgrade.v1beta1.SoftwareUpgradeProposal': {
+                    const content = msgContent as SoftwareUpgradeProposal;
+                    const plan = content.getPlan();
+                    return {
+                      proposalType: 'Software Upgrade Proposal',
+                      title: content.getTitle(),
+                      description: content.getDescription(),
+                      plan: {
+                        name: plan?.getName(),
+                        height: plan?.getHeight(),
+                        info: plan?.getInfo(),
+                      },
+                    };
+                  }
+                  case 'cosmos.upgrade.v1beta1.CancelSoftwareUpgradeProposal': {
+                    const content = msgContent as CancelSoftwareUpgradeProposal;
+                    return {
+                      proposalType: 'Cancel Software Upgrade Proposal',
+                      title: content.getTitle(),
+                      description: content.getDescription(),
+                    };
+                  }
+                  case 'cosmwasm.wasm.v1.StoreCodeProposal': {
+                    const content = msgContent as StoreCodeProposal;
+                    const instantiatePerms = content.getInstantiatePermission();
+                    // First, create a local object of the enum values so
+                    // they can be easily displayed
+                    const localEnum = Object.keys(AccessType).map((type) => type);
+                    console.log(localEnum);
+                    // Check permission type. If an address list, we need to display it correctly
+                    const permissionType =
+                      localEnum[Number(instantiatePerms?.getPermission())];
+                    console.log(instantiatePerms?.getPermission());
+                    return {
+                      proposalType: 'Store Code Proposal',
+                      title: content.getTitle(),
+                      description: content.getDescription(),
+                      runAs: content.getRunAs(),
+                      wasmByteCode: content.getWasmByteCode_asB64(),
+                      // If no permission type, omit this field
+                      ...(permissionType && {
+                        instantiatePermission: {
+                          address: instantiatePerms?.getAddress(),
+                          permission: permissionType,
+                          // Conditionally return address list if permissioned
+                          ...(permissionType === 'ACCESS_TYPE_ANY_OF_ADDRESSES' && {
+                            permissionList: instantiatePerms
+                              ?.getAddressesList()
+                              .map((address, index) => {
+                                address;
+                              }),
+                          }),
+                        },
+                      }),
+                    };
+                  }
+                  case 'cosmwasm.wasm.v1.InstantiateCodeProposal': {
+                    const content = msgContent as InstantiateContractProposal;
+                    return {
+                      proposalType: 'Instantiate Code Proposal',
+                      title: content.getTitle(),
+                      description: content.getDescription(),
+                      runAs: content.getRunAs(),
+                      admin: content.getAdmin(),
+                      codeId: content.getCodeId(),
+                      label: content.getLabel(),
+                      msg: content.getMsg_asB64(),
+                      fundsList: content.getFundsList().map((coin) => ({
+                        denom: coin.getDenom(),
+                        amount: Number(coin.getAmount()),
+                      })),
+                    };
+                  }
+                  case 'cosmos.params.v1beta1.ParameterChangeProposal': {
+                    const content = msgContent as ParameterChangeProposal;
+                    return {
+                      proposalType: 'Parameter Change Proposal',
+                      title: content.getTitle(),
+                      description: content.getDescription(),
+                      changesList: content.getChangesList().map((change) => ({
+                        subspace: change.getSubspace(),
+                        key: change.getKey(),
+                        value: change.getValue(),
+                      })),
+                    };
+                  }
+                  default:
+                    return {
+                      proposalType: subMessageTypeName,
+                      ...msgContent,
+                    };
+                }
+              }
+            }
+            // If the typeName isn't support, don't fail, just return the message unformatted
+            return {
+              typeName,
+              msg,
+            };
+          }),
+        };
+      }
       default:
         return {
           typeName: 'MsgGeneric',
