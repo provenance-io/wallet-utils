@@ -386,13 +386,17 @@ export const buildMessage = (
     case 'MsgSubmitGroupProposal': {
       const { messagesList, exec, groupPolicyAddress, metadata, proposersList } =
         params as MsgSubmitGroupProposalDisplay;
-
+      const messagesListAny = messagesList.map((message) =>
+        new google_protobuf_any_pb.Any()
+          .setTypeUrl(message.typeUrl)
+          .setValue(message.value)
+      );
       const msgSubmitGroupProposal = new MsgSubmitGroupProposal()
         .setExec(exec)
         .setMetadata(metadata)
         .setGroupPolicyAddress(groupPolicyAddress)
         .setProposersList(proposersList)
-        .setMessagesList(messagesList);
+        .setMessagesList(messagesListAny);
 
       return msgSubmitGroupProposal;
     }
