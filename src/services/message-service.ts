@@ -73,7 +73,10 @@ import { MarkerStatus, MarkerType } from '../proto/provenance/marker/v1/marker_p
 import { Access } from '../proto/provenance/marker/v1/accessgrant_pb';
 import { formatCustomObj, formatSingleValue } from '../utils';
 import { isMatching, P } from 'ts-pattern';
-import { MsgCreateGroup } from '../proto/cosmos/group/v1/tx_pb';
+import {
+  MsgCreateGroup,
+  MsgSubmitProposal as MsgSubmitGroupProposal,
+} from '../proto/cosmos/group/v1/tx_pb';
 import { MemberRequest } from '../proto/cosmos/group/v1/types_pb';
 import {
   MsgExecLegacyContent,
@@ -378,6 +381,24 @@ export const buildMessage = (
         );
       });
       return msgCreateGroup;
+    }
+
+    case 'MsgSubmitGroupProposal': {
+      const { messagesList, exec, groupPolicyAddress, metadata, proposersList } =
+        params as MsgSubmitGroupProposalDisplay;
+      const messagesListAny = messagesList.map((message) =>
+        new google_protobuf_any_pb.Any()
+          .setTypeUrl(message.typeUrl)
+          .setValue(message.value)
+      );
+      const msgSubmitGroupProposal = new MsgSubmitGroupProposal()
+        .setExec(exec)
+        .setMetadata(metadata)
+        .setGroupPolicyAddress(groupPolicyAddress)
+        .setProposersList(proposersList)
+        .setMessagesList(messagesListAny);
+
+      return msgSubmitGroupProposal;
     }
 
     case 'MsgExecuteContract': {
