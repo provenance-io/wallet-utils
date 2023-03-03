@@ -106,7 +106,11 @@ import {
   ParamChange,
   ParameterChangeProposal,
 } from '../proto/cosmos/params/v1beta1/params_pb';
-import { MsgExecuteContract } from '../proto/cosmwasm/wasm/v1/tx_pb';
+import {
+  MsgExecuteContract,
+  MsgInstantiateContract,
+  MsgInstantiateContract2,
+} from '../proto/cosmwasm/wasm/v1/tx_pb';
 import { MsgSubmitEvidence } from '../proto/cosmos/evidence/v1beta1/tx_pb';
 import { Evidence } from '../proto/tendermint/abci/types_pb';
 import { PubKey } from '../proto/cosmos/crypto/secp256k1/keys_pb';
@@ -162,6 +166,8 @@ export type SupportedMessageTypeNames =
   | 'cosmwasm.wasm.v1.AccessConfig'
   | 'cosmwasm.wasm.v1.InstantiateCodeProposal'
   | 'cosmwasm.wasm.v1.MsgExecuteContract'
+  | 'cosmwasm.wasm.v1.MsgInstantiateContract'
+  | 'cosmwasm.wasm.v1.MsgInstantiateContract2'
   | 'cosmwasm.wasm.v1.StoreCodeProposal'
   | 'provenance.attribute.v1.MsgAddAttributeRequest'
   | 'provenance.attribute.v1.MsgDeleteAttributeRequest'
@@ -254,6 +260,8 @@ export type ReadableMessageNames =
   | 'MsgUndelegate'
   | 'MsgCreateVestingAccount'
   | 'MsgExecuteContract'
+  | 'MsgInstantiateContract'
+  | 'MsgInstantiateContract2'
   | 'MsgAddAttributeRequest'
   | 'MsgDeleteAttributeRequest'
   | 'MsgDeleteDistinctAttributeRequest'
@@ -351,6 +359,8 @@ export const TYPE_NAMES_READABLE_MAP: {
   MsgUndelegate: 'cosmos.staking.v1beta1.MsgUndelegate',
   MsgCreateVestingAccount: 'cosmos.vesting.v1beta1.MsgCreateVestingAccount',
   MsgExecuteContract: 'cosmwasm.wasm.v1.MsgExecuteContract',
+  MsgInstantiateContract: 'cosmwasm.wasm.v1.MsgInstantiateContract',
+  MsgInstantiateContract2: 'cosmwasm.wasm.v1.MsgInstantiateContract2',
   MsgAddAttributeRequest: 'provenance.attribute.v1.MsgAddAttributeRequest',
   MsgDeleteAttributeRequest: 'provenance.attribute.v1.MsgDeleteAttributeRequest',
   MsgDeleteDistinctAttributeRequest:
@@ -455,6 +465,8 @@ export type MsgWithdrawProposalDisplay = MsgWithdrawProposal.AsObject;
 export type MsgGroupVoteDisplay = MsgGroupVote.AsObject;
 export type MsgExecDisplay = MsgExec.AsObject;
 export type MsgLeaveGroupDisplay = MsgLeaveGroup.AsObject;
+export type MsgInstantiateContractDisplay = MsgInstantiateContract.AsObject;
+export type MsgInstantiateContract2Display = MsgInstantiateContract2.AsObject;
 
 export type AtsMessage = {
   contractType: 'ats';
@@ -537,6 +549,8 @@ export const MESSAGE_PROTOS: { [key in SupportedMessageTypeNames]: typeof Messag
     'cosmwasm.wasm.v1.AccessConfig': AccessConfig,
     'cosmwasm.wasm.v1.InstantiateCodeProposal': InstantiateContractProposal,
     'cosmwasm.wasm.v1.MsgExecuteContract': MsgExecuteContract,
+    'cosmwasm.wasm.v1.MsgInstantiateContract': MsgInstantiateContract,
+    'cosmwasm.wasm.v1.MsgInstantiateContract2': MsgInstantiateContract2,
     'cosmwasm.wasm.v1.StoreCodeProposal': StoreCodeProposal,
     'cosmos.gov.v1.MsgVoteWeighted': MsgVoteWeighted,
     'provenance.attribute.v1.MsgAddAttributeRequest': MsgAddAttributeRequest,
