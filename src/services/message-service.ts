@@ -3,7 +3,11 @@ import { Message } from 'google-protobuf';
 import type { Msg, Wallet } from '@tendermint/sig';
 import type { Bytes } from '@tendermint/types';
 import { base64ToBytes, bufferToBytes, bytesToBase64 } from '@tendermint/belt';
-import { MsgExecuteContract } from '../proto/cosmwasm/wasm/v1/tx_pb';
+import {
+  MsgExecuteContract,
+  MsgInstantiateContract,
+  MsgInstantiateContract2,
+} from '../proto/cosmwasm/wasm/v1/tx_pb';
 import { createHash } from 'crypto';
 import { ecdsaSign as secp256k1EcdsaSign } from 'secp256k1';
 import {
@@ -44,6 +48,8 @@ import {
   MsgVoteWeightedDisplay,
   MsgWithdrawDelegatorRewardDisplay,
   MsgWithdrawValidatorCommissionDisplay,
+  MsgInstantiateContractDisplay,
+  MsgInstantiateContract2Display,
   ReadableMessageNames,
   TYPE_NAMES_READABLE_MAP,
   SupportedMessageTypeNames,
@@ -74,8 +80,10 @@ import { Access } from '../proto/provenance/marker/v1/accessgrant_pb';
 import { formatCustomObj, formatSingleValue } from '../utils';
 import { isMatching, P } from 'ts-pattern';
 import {
+  Exec,
   MsgCreateGroup,
   MsgSubmitProposal as MsgSubmitGroupProposal,
+  MsgVote as MsgGroupVote,
 } from '../proto/cosmos/group/v1/tx_pb';
 import { MemberRequest } from '../proto/cosmos/group/v1/types_pb';
 import {
@@ -340,6 +348,8 @@ export const buildMessage = (
     | MsgGroupVoteDisplay
     | MsgExecDisplay
     | MsgLeaveGroupDisplay
+    | MsgInstantiateContractDisplay
+    | MsgInstantiateContract2Display
 ) => {
   switch (type) {
     case 'MsgDelegate': {
@@ -399,6 +409,54 @@ export const buildMessage = (
         .setMessagesList(messagesListAny);
 
       return msgSubmitGroupProposal;
+    }
+
+    case 'MsgGroupVote': {
+      const { proposalId, voter, option, exec, metadata } =
+        params as MsgGroupVoteDisplay;
+      const msgGroupVote = new MsgGroupVote()
+        .setProposalId(proposalId)
+        .setVoter(voter)
+        .setOption(option)
+        .setExec(exec)
+        .setMetadata(metadata);
+      return msgGroupVote;
+    }
+
+    case 'MsgInstantiateContract': {
+      const { sender, admin, codeId, label, msg, fundsList } =
+        params as MsgInstantiateContractDisplay;
+      const msgInstantiateContract = new MsgInstantiateContract()
+        .setSender(sender)
+        .setAdmin(admin)
+        .setCodeId(codeId)
+        .setLabel(label)
+        .setMsg(msg);
+      fundsList.forEach(({ denom, amount }) => {
+        msgInstantiateContract.addFunds(
+          new Coin().setAmount(`${amount}`).setDenom(denom)
+        );
+      });
+      return msgInstantiateContract;
+    }
+
+    case 'MsgInstantiateContract2': {
+      const { sender, admin, codeId, label, msg, fundsList, salt, fixMsg } =
+        params as MsgInstantiateContract2Display;
+      const msgInstantiateContract = new MsgInstantiateContract2()
+        .setSender(sender)
+        .setAdmin(admin)
+        .setCodeId(codeId)
+        .setLabel(label)
+        .setMsg(msg)
+        .setSalt(salt)
+        .setFixMsg(fixMsg);
+      fundsList.forEach(({ denom, amount }) => {
+        msgInstantiateContract.addFunds(
+          new Coin().setAmount(`${amount}`).setDenom(denom)
+        );
+      });
+      return msgInstantiateContract;
     }
 
     case 'MsgExecuteContract': {
@@ -500,6 +558,7 @@ export const unpackDisplayObjectFromWalletMessage = (
   | MsgSendDisplay
   | MsgExecuteContractDisplay
   | MsgSubmitProposalDisplay
+  | MsgSubmitGroupProposalDisplay
   | GenericDisplay
 ) & {
   typeName: ReadableMessageNames | FallbackGenericMessageName;
@@ -544,6 +603,41 @@ export const unpackDisplayObjectFromWalletMessage = (
           })),
         };
       }
+      case 'cosmwasm.wasm.v1.MsgInstantiateContract': {
+        const msgContent = message as MsgInstantiateContract;
+        const instantiateMsg = JSON.parse(
+          decoder.decode(msgContent.getMsg() as Uint8Array)
+        );
+        return {
+          typeName: 'MsgInstantiateContract',
+          sender: msgContent.getSender(),
+          admin: msgContent.getAdmin(),
+          codeId: msgContent.getCodeId(),
+          label: msgContent.getLabel(),
+          msg: instantiateMsg,
+          fundsList: msgContent.getFundsList().map((coin) => ({
+            denom: coin.getDenom(),
+            amount: Number(coin.getAmount()),
+          })),
+        };
+      }
+      case 'cosmwasm.wasm.v1.MsgInstantiateContract2': {
+        const msgContent = message as MsgInstantiateContract2;
+        return {
+          typeName: 'MsgInstantiateContract2',
+          sender: msgContent.getSender(),
+          admin: msgContent.getAdmin(),
+          codeId: msgContent.getCodeId(),
+          label: msgContent.getLabel(),
+          msg: JSON.parse(decoder.decode(msgContent.getMsg() as Uint8Array)),
+          salt: JSON.parse(decoder.decode(msgContent.getSalt() as Uint8Array)),
+          fixMsg: msgContent.getFixMsg(),
+          fundsList: msgContent.getFundsList().map((coin) => ({
+            denom: coin.getDenom(),
+            amount: Number(coin.getAmount()),
+          })),
+        };
+      }
       case 'cosmwasm.wasm.v1.MsgExecuteContract':
         return {
           typeName: 'MsgExecuteContractGeneric',
@@ -556,6 +650,42 @@ export const unpackDisplayObjectFromWalletMessage = (
             amount: Number(coin.getAmount()),
           })),
         };
+      case 'cosmos.group.v1.MsgSubmitProposal': {
+        const msgContent = message as MsgSubmitGroupProposal;
+        // Create a local object of the Exec enum values so
+        // they can be easily displayed
+        const execEnum = Object.keys(Exec).map((exec) => exec);
+        return {
+          typeName: 'MsgSubmitGroupProposal',
+          groupPolicyAddress: msgContent.getGroupPolicyAddress(),
+          proposersList: msgContent.getProposersList().map((proposer) => proposer),
+          metadata: msgContent.getMetadata(),
+          // Unpack and display messages
+          messagesList: msgContent.getMessagesList().map((msg) => {
+            // Serialize and convert msg proto to base64, and recursively
+            // unpack each message
+            return unpackDisplayObjectFromWalletMessage(
+              bytesToBase64(msg.serializeBinary())
+            );
+          }),
+          exec: execEnum[msgContent.getExec()],
+        };
+      }
+      case 'cosmos.group.v1.MsgVote': {
+        const msgContent = message as MsgGroupVote;
+        // Create a local object of the enum values so
+        // they can be easily displayed
+        const voteEnum = Object.keys(VoteOption).map((vote) => vote);
+        const execEnum = Object.keys(Exec).map((exec) => exec);
+        return {
+          typeName: 'MsgGroupVote',
+          proposalId: msgContent.getProposalId(),
+          voter: msgContent.getVoter(),
+          option: voteEnum[msgContent.getOption()],
+          metadata: msgContent.getMetadata(),
+          exec: execEnum[msgContent.getExec()],
+        };
+      }
       case 'provenance.marker.v1.MsgAddMarkerRequest':
         const getKey = (map: { [key: string]: any }, val: any) =>
           Object.keys(map).find((key) => map[key] === val);
@@ -647,11 +777,9 @@ export const unpackDisplayObjectFromWalletMessage = (
                     // First, create a local object of the enum values so
                     // they can be easily displayed
                     const localEnum = Object.keys(AccessType).map((type) => type);
-                    console.log(localEnum);
                     // Check permission type. If an address list, we need to display it correctly
                     const permissionType =
                       localEnum[Number(instantiatePerms?.getPermission())];
-                    console.log(instantiatePerms?.getPermission());
                     return {
                       proposalType: 'Store Code Proposal',
                       title: content.getTitle(),
@@ -667,7 +795,7 @@ export const unpackDisplayObjectFromWalletMessage = (
                           ...(permissionType === 'ACCESS_TYPE_ANY_OF_ADDRESSES' && {
                             permissionList: instantiatePerms
                               ?.getAddressesList()
-                              .map((address, index) => {
+                              .map((address) => {
                                 address;
                               }),
                           }),
@@ -713,7 +841,7 @@ export const unpackDisplayObjectFromWalletMessage = (
                 }
               }
             }
-            // If the typeName isn't support, don't fail, just return the message unformatted
+            // If the typeName isn't supported, don't fail, just return the message unformatted
             return {
               typeName,
               msg,
