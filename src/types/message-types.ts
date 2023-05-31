@@ -21,9 +21,7 @@ import {
   MsgDeleteScopeRequest,
   MsgDeleteScopeSpecificationRequest,
   MsgModifyOSLocatorRequest,
-  MsgP8eMemorializeContractRequest,
   MsgWriteContractSpecificationRequest,
-  MsgWriteP8eContractSpecRequest,
   MsgWriteRecordRequest,
   MsgWriteRecordSpecificationRequest,
   MsgWriteScopeRequest,
@@ -194,9 +192,7 @@ export type SupportedMessageTypeNames =
   | 'provenance.metadata.v1.MsgDeleteScopeRequest'
   | 'provenance.metadata.v1.MsgDeleteScopeSpecificationRequest'
   | 'provenance.metadata.v1.MsgModifyOSLocatorRequest'
-  | 'provenance.metadata.v1.MsgP8eMemorializeContractRequest'
   | 'provenance.metadata.v1.MsgWriteContractSpecificationRequest'
-  | 'provenance.metadata.v1.MsgWriteP8eContractSpecRequest'
   | 'provenance.metadata.v1.MsgWriteRecordRequest'
   | 'provenance.metadata.v1.MsgWriteRecordSpecificationRequest'
   | 'provenance.metadata.v1.MsgWriteScopeRequest'
@@ -285,9 +281,7 @@ export type ReadableMessageNames =
   | 'MsgDeleteScopeRequest'
   | 'MsgDeleteScopeSpecificationRequest'
   | 'MsgModifyOSLocatorRequest'
-  | 'MsgP8eMemorializeContractRequest'
   | 'MsgWriteContractSpecificationRequest'
-  | 'MsgWriteP8eContractSpecRequest'
   | 'MsgWriteRecordRequest'
   | 'MsgWriteRecordSpecificationRequest'
   | 'MsgWriteScopeRequest'
@@ -390,12 +384,8 @@ export const TYPE_NAMES_READABLE_MAP: {
   MsgDeleteScopeSpecificationRequest:
     'provenance.metadata.v1.MsgDeleteScopeSpecificationRequest',
   MsgModifyOSLocatorRequest: 'provenance.metadata.v1.MsgModifyOSLocatorRequest',
-  MsgP8eMemorializeContractRequest:
-    'provenance.metadata.v1.MsgP8eMemorializeContractRequest',
   MsgWriteContractSpecificationRequest:
     'provenance.metadata.v1.MsgWriteContractSpecificationRequest',
-  MsgWriteP8eContractSpecRequest:
-    'provenance.metadata.v1.MsgWriteP8eContractSpecRequest',
   MsgWriteRecordRequest: 'provenance.metadata.v1.MsgWriteRecordRequest',
   MsgWriteRecordSpecificationRequest:
     'provenance.metadata.v1.MsgWriteRecordSpecificationRequest',
@@ -578,12 +568,8 @@ export const MESSAGE_PROTOS: { [key in SupportedMessageTypeNames]: typeof Messag
     'provenance.metadata.v1.MsgDeleteScopeSpecificationRequest':
       MsgDeleteScopeSpecificationRequest,
     'provenance.metadata.v1.MsgModifyOSLocatorRequest': MsgModifyOSLocatorRequest,
-    'provenance.metadata.v1.MsgP8eMemorializeContractRequest':
-      MsgP8eMemorializeContractRequest,
     'provenance.metadata.v1.MsgWriteContractSpecificationRequest':
       MsgWriteContractSpecificationRequest,
-    'provenance.metadata.v1.MsgWriteP8eContractSpecRequest':
-      MsgWriteP8eContractSpecRequest,
     'provenance.metadata.v1.MsgWriteRecordRequest': MsgWriteRecordRequest,
     'provenance.metadata.v1.MsgWriteRecordSpecificationRequest':
       MsgWriteRecordSpecificationRequest,

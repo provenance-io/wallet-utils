@@ -31,12 +31,10 @@ done
 
 echo "Copying compiled files from third_party/build to src/proto"
 rm -rf ./src/proto/*
+
 cp -r ./third_party/build/* ./src/proto/.
 
 echo "Cleaning build"
 rm -rf third_party/build/*
-
-echo "Cleaning protos"
-rm -rf third_party/proto
 
 echo "Process has completed"
