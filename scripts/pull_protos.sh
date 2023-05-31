@@ -1,7 +1,7 @@
 #!/bin/bash
 
 if [ "$#" -ne 1 ]; then
-    echo "Illegal number of parameters: release required (e.g. v1.13.0-rc3)"
+    echo "Illegal number of parameters: release required (e.g. v1.15.0)"
     exit 1;
 fi
 
@@ -14,6 +14,7 @@ echo "Using release $REL"
 echo "Starting proto copy"
 
 echo "Removing existing protos"
+mkdir -p third_party
 cd third_party
 rm -rf proto
 

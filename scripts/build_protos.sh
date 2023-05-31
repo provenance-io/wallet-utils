@@ -36,4 +36,7 @@ cp -r ./third_party/build/* ./src/proto/.
 echo "Cleaning build"
 rm -rf third_party/build/*
 
+echo "Cleaning protos"
+rm -rf third_party/proto
+
 echo "Process has completed"
