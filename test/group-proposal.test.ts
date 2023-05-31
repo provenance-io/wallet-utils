@@ -44,7 +44,7 @@ describe(`test build group proposal`, () => {
         msgSubmitProposal.addMessages(msgSendCoinAny)
 
         let m = createAnyMessageBase64('MsgSubmitGroupProposal', msgSubmitProposal);
-        expect(m).toEqual("CiIvY29zbW9zLmdyb3VwLnYxLk1zZ1N1Ym1pdFByb3Bvc2FsEp0CCj10cDEycWxuODJkZTU5eWc3ajRlMDI5emQzM2pkaDVzMmw1d244NnpwanVxMHdrOWMwNmY4NzZxemtmN2UyEil0cDF5cnRjaHQ5MGt2c2NjNzk2YWRhajd2aHI3NDI5NXRlcWE2cXNyMhoRa2ljayBhc3MgcHJvcG9zYWwimwEKHC9jb3Ntb3MuYmFuay52MWJldGExLk1zZ1NlbmQSewo9dHAxMnFsbjgyZGU1OXlnN2o0ZTAyOXpkMzNqZGg1czJsNXduODZ6cGp1cTB3azljMDZmODc2cXprZjdlMhIpdHAxdnhsY3hwMnZqbnlqdXc2bXFuOWQ4Y3E2MmNldTZsbGxwdXNoeTYaDwoFbmhhc2gSBjEwMDAwMCgB");
+        expect(m).toEqual(expectedB64);
     });
 
     it(`should build group proposal with buildMessage`, () => {
@@ -67,7 +67,7 @@ describe(`test build group proposal`, () => {
 
         const msgSubmitProposal = buildMessage('MsgSubmitGroupProposal', groupProposal);
         let m = createAnyMessageBase64('MsgSubmitGroupProposal', msgSubmitProposal as Message);
-        expect(m).toEqual("CiIvY29zbW9zLmdyb3VwLnYxLk1zZ1N1Ym1pdFByb3Bvc2FsEp0CCj10cDEycWxuODJkZTU5eWc3ajRlMDI5emQzM2pkaDVzMmw1d244NnpwanVxMHdrOWMwNmY4NzZxemtmN2UyEil0cDF5cnRjaHQ5MGt2c2NjNzk2YWRhajd2aHI3NDI5NXRlcWE2cXNyMhoRa2ljayBhc3MgcHJvcG9zYWwimwEKHC9jb3Ntb3MuYmFuay52MWJldGExLk1zZ1NlbmQSewo9dHAxMnFsbjgyZGU1OXlnN2o0ZTAyOXpkMzNqZGg1czJsNXduODZ6cGp1cTB3azljMDZmODc2cXprZjdlMhIpdHAxdnhsY3hwMnZqbnlqdXc2bXFuOWQ4Y3E2MmNldTZsbGxwdXNoeTYaDwoFbmhhc2gSBjEwMDAwMCgB");
+        expect(m).toEqual(expectedB64);
 
     });
 
@@ -75,7 +75,7 @@ describe(`test build group proposal`, () => {
 
         const markerAuth = new MarkerTransferAuthorization();
         const coin = new Coin();
-        coin.setAmount('10000');
+        coin.setAmount(amt);
         coin.setDenom('cusd.deposit');
         markerAuth.addTransferLimit(coin);
         const markerAuthAny = new Any();
