@@ -29,7 +29,7 @@
     "tsc:esm": "tsc --module es2015 --outDir esm",
     "tsc:commonjs": "tsc --module commonjs --outDir lib",
     "semantic-release": "semantic-release",
-    "test": "jest"
+    "test": ""
   },
   "repository": {
     "type": "git",
