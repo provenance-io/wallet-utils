@@ -51,9 +51,9 @@ import {
   MsgCreateGroup,
   MsgSubmitProposal as MsgSubmitGroupProposal,
   MsgVote as MsgGroupVote,
+  MsgExec as MsgGroupExec,
 } from '../../../proto/cosmos/group/v1/tx_pb';
 import { MemberRequest } from '../../../proto/cosmos/group/v1/types_pb';
-
 const encoder = new TextEncoder();
 
 /**
@@ -173,6 +173,14 @@ export const buildMessage = (
         .setExec(exec)
         .setMetadata(metadata);
       return msgGroupVote;
+    }
+
+    case 'MsgExec': {
+      const { proposalId, executor } = params as MsgExecDisplay;
+      const msgExec = new MsgGroupExec()
+        .setProposalId(proposalId)
+        .setExecutor(executor);
+      return msgExec;
     }
 
     case 'MsgInstantiateContract': {
