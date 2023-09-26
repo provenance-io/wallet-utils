@@ -31,6 +31,7 @@ done
 
 echo "Copying compiled files from third_party/build to src/proto"
 rm -rf ./src/proto/*
+
 cp -r ./third_party/build/* ./src/proto/.
 
 echo "Cleaning build"
