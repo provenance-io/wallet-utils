@@ -1,7 +1,7 @@
 #!/bin/bash
 
 if [ "$#" -ne 1 ]; then
-    echo "Illegal number of parameters: release required (e.g. v1.13.0-rc3)"
+    echo "Illegal number of parameters: release required (e.g. v1.16.0)"
     exit 1;
 fi
 

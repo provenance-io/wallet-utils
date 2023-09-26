@@ -23,7 +23,7 @@
     "clean": "rm -rf ./lib ./esm",
     "commit": "npx cz",
     "postbuild": "node ./scripts/checkCircularDeps.js",
-    "pull:protos": "bash ./scripts/pull_protos.sh v1.13.0-rc3",
+    "pull:protos": "bash ./scripts/pull_protos.sh v1.16.0",
     "prepare": "npm run build && husky install",
     "tsc:esm": "tsc --module es2015 --outDir esm",
     "tsc:commonjs": "tsc --module commonjs --outDir lib",
