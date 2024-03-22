@@ -49,6 +49,17 @@ import {
   MsgWithdrawRequest,
 } from '../proto/provenance/marker/v1/tx_pb';
 import {
+  MsgCommitFundsRequest,
+  MsgCreatePaymentRequest,
+  MsgAcceptPaymentRequest,
+  MsgRejectPaymentRequest,
+  MsgRejectPaymentsRequest,
+  MsgCancelPaymentsRequest,
+  MsgCreateAskRequest,
+  MsgCreateBidRequest,
+  MsgCancelOrderRequest,
+} from '../proto/provenance/exchange/v1/tx_pb';
+import {
   MsgSetWithdrawAddress,
   MsgWithdrawDelegatorReward,
   MsgWithdrawValidatorCommission,
@@ -115,7 +126,6 @@ import { PubKey } from '../proto/cosmos/crypto/secp256k1/keys_pb';
 
 import { ExecuteMsg } from './schema/ats-smart-contract/execute_msg';
 import { ExecuteMsg as DigitalCurrencyConsortiumExecuteMsg } from './schema/digital-currency-consortium/execute_msg';
-import { CoinAsObject } from './layout';
 
 export type SupportedMessageTypeNames =
   | 'cosmos.authz.v1beta1.MsgGrant'
@@ -206,7 +216,17 @@ export type SupportedMessageTypeNames =
   | 'provenance.metadata.v1.MsgWriteSessionRequest'
   | 'provenance.name.v1.MsgBindNameRequest'
   | 'provenance.name.v1.MsgDeleteNameRequest'
-  | 'tendermint.abci.Evidence';
+  | 'tendermint.abci.Evidence'
+  // Provenance Exchange
+  | 'provenance.exchange.v1.MsgCommitFundsRequest'
+  | 'provenance.exchange.v1.MsgCreatePaymentRequest'
+  | 'provenance.exchange.v1.MsgAcceptPaymentRequest'
+  | 'provenance.exchange.v1.MsgRejectPaymentRequest'
+  | 'provenance.exchange.v1.MsgRejectPaymentsRequest'
+  | 'provenance.exchange.v1.MsgCancelPaymentsRequest'
+  | 'provenance.exchange.v1.MsgCreateAskRequest'
+  | 'provenance.exchange.v1.MsgCreateBidRequest'
+  | 'provenance.exchange.v1.MsgCancelOrderRequest';
 
 export type ReadableMessageNames =
   | 'MsgGrant'
@@ -297,7 +317,17 @@ export type ReadableMessageNames =
   | 'MsgWriteSessionRequest'
   | 'MsgBindNameRequest'
   | 'MsgDeleteNameRequest'
-  | 'Evidence';
+  | 'Evidence'
+  // Provenance Exchange
+  | 'MsgCommitFundsRequest'
+  | 'MsgCreatePaymentRequest'
+  | 'MsgAcceptPaymentRequest'
+  | 'MsgRejectPaymentRequest'
+  | 'MsgRejectPaymentsRequest'
+  | 'MsgCancelPaymentsRequest'
+  | 'MsgCreateAskRequest'
+  | 'MsgCreateBidRequest'
+  | 'MsgCancelOrderRequest';
 
 export const TYPE_NAMES_READABLE_MAP: {
   [key in ReadableMessageNames]: SupportedMessageTypeNames;
@@ -406,7 +436,28 @@ export const TYPE_NAMES_READABLE_MAP: {
   MsgBindNameRequest: 'provenance.name.v1.MsgBindNameRequest',
   MsgDeleteNameRequest: 'provenance.name.v1.MsgDeleteNameRequest',
   Evidence: 'tendermint.abci.Evidence',
+  // Provenance Exchange
+  MsgCommitFundsRequest: 'provenance.exchange.v1.MsgCommitFundsRequest',
+  MsgCreatePaymentRequest: 'provenance.exchange.v1.MsgCreatePaymentRequest',
+  MsgAcceptPaymentRequest: 'provenance.exchange.v1.MsgAcceptPaymentRequest',
+  MsgRejectPaymentRequest: 'provenance.exchange.v1.MsgRejectPaymentRequest',
+  MsgRejectPaymentsRequest: 'provenance.exchange.v1.MsgRejectPaymentsRequest',
+  MsgCancelPaymentsRequest: 'provenance.exchange.v1.MsgCancelPaymentsRequest',
+  MsgCreateAskRequest: 'provenance.exchange.v1.MsgCreateAskRequest',
+  MsgCreateBidRequest: 'provenance.exchange.v1.MsgCreateBidRequest',
+  MsgCancelOrderRequest: 'provenance.exchange.v1.MsgCancelOrderRequest',
 };
+
+// Provenance Exchange
+export type MsgCommitFundsRequestDisplay = MsgCommitFundsRequest.AsObject;
+export type MsgCreatePaymentRequestDisplay = MsgCreatePaymentRequest.AsObject;
+export type MsgAcceptPaymentRequestDisplay = MsgAcceptPaymentRequest.AsObject;
+export type MsgRejectPaymentRequestDisplay = MsgRejectPaymentRequest.AsObject;
+export type MsgRejectPaymentsRequestDisplay = MsgRejectPaymentsRequest.AsObject;
+export type MsgCancelPaymentsRequestDisplay = MsgCancelPaymentsRequest.AsObject;
+export type MsgCreateAskRequestDisplay = MsgCreateAskRequest.AsObject;
+export type MsgCreateBidRequestDisplay = MsgCreateBidRequest.AsObject;
+export type MsgCancelOrderRequestDisplay = MsgCancelOrderRequest.AsObject;
 
 export type MsgSendDisplay = MsgSend.AsObject;
 export type MsgVerifyInvariantDisplay = MsgVerifyInvariant.AsObject;
@@ -594,4 +645,14 @@ export const MESSAGE_PROTOS: { [key in SupportedMessageTypeNames]: typeof Messag
     'provenance.name.v1.MsgBindNameRequest': MsgBindNameRequest,
     'provenance.name.v1.MsgDeleteNameRequest': MsgDeleteNameRequest,
     'tendermint.abci.Evidence': Evidence,
+    // Provenance Exchange
+    'provenance.exchange.v1.MsgCommitFundsRequest': MsgCommitFundsRequest,
+    'provenance.exchange.v1.MsgCreatePaymentRequest': MsgCreatePaymentRequest,
+    'provenance.exchange.v1.MsgAcceptPaymentRequest': MsgAcceptPaymentRequest,
+    'provenance.exchange.v1.MsgRejectPaymentRequest': MsgRejectPaymentRequest,
+    'provenance.exchange.v1.MsgRejectPaymentsRequest': MsgRejectPaymentsRequest,
+    'provenance.exchange.v1.MsgCancelPaymentsRequest': MsgCancelPaymentsRequest,
+    'provenance.exchange.v1.MsgCreateAskRequest': MsgCreateAskRequest,
+    'provenance.exchange.v1.MsgCreateBidRequest': MsgCreateBidRequest,
+    'provenance.exchange.v1.MsgCancelOrderRequest': MsgCancelOrderRequest,
   };
