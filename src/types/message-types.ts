@@ -189,6 +189,7 @@ export type SupportedMessageTypeNames =
   | 'provenance.exchange.v1.MsgCreateAskRequest'
   | 'provenance.exchange.v1.MsgCreateBidRequest'
   | 'provenance.exchange.v1.MsgCancelOrderRequest'
+  // Provenance Smart Accounts
   | 'provenance.smartaccounts.v1.MsgUpdateParams'
   | 'provenance.smartaccounts.v1.MsgRegisterFido2Credential'
   | 'provenance.smartaccounts.v1.MsgRegisterCosmosCredential'
