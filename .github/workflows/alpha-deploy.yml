@@ -1,8 +1,9 @@
+name: alpha-deploy
 on:
   workflow_dispatch:
     inputs:
       branch:
-        description: 'Branch to release from'
+        description: 'Branch to deploy alpha version from'
         required: true
         default: 'main'
 
