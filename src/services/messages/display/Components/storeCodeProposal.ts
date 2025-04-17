@@ -1,5 +1,5 @@
 import { ReadableMessageNames } from 'types';
-import { StoreCodeProposal } from '../../../../proto/cosmwasm/wasm/v1/proposal_pb';
+import { StoreCodeProposal } from '../../../../proto/cosmwasm/wasm/v1/proposal_legacy_pb';
 import { accessTypeOptions } from '../../../../utils';
 
 /**
@@ -21,7 +21,7 @@ export const storeCodeProposal = (message: StoreCodeProposal) => {
     // If no permission type, omit this field
     ...(permissionType && {
       instantiatePermission: {
-        address: instantiatePerms?.getAddress(),
+        address: instantiatePerms?.getAddressesList()[0],
         permission: permissionType,
         // Conditionally return address list if permissioned
         ...(permissionType === 'ACCESS_TYPE_ANY_OF_ADDRESSES' && {

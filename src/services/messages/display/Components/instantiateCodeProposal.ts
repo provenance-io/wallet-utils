@@ -1,4 +1,4 @@
-import { InstantiateContractProposal } from '../../../../proto/cosmwasm/wasm/v1/proposal_pb';
+import { InstantiateContractProposal } from '../../../../proto/cosmwasm/wasm/v1/proposal_legacy_pb';
 import { ReadableMessageNames } from 'types';
 
 /**
