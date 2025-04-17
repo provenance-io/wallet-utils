@@ -276,6 +276,7 @@ export type ReadableMessageNames =
   | 'MsgCreateBidRequest'
   | 'MsgCancelOrderRequest'
   | 'MsgUpdateParams'
+  // Provenance Smart Accounts
   | 'MsgRegisterFido2Credential'
   | 'MsgRegisterCosmosCredential'
   | 'MsgMigrateToSmartAccountAuthentication'
