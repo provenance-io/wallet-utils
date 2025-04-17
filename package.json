@@ -114,6 +114,7 @@
     ]
   },
   "dependencies": {
+    "@noble/hashes": "^1.7.2",
     "@tendermint/belt": "0.3.0",
     "@tendermint/sig": "0.6.0",
     "date-fns": "^2.29.3",
