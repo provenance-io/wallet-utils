@@ -17,7 +17,6 @@ import {
   MsgRevokeDisplay,
   MsgSendDisplay,
   MsgSetWithdrawAddressDisplay,
-  MsgSubmitEvidenceDisplay,
   MsgCreateGroupDisplay,
   MsgUpdateGroupMembersDisplay,
   MsgUpdateGroupAdminDisplay,
@@ -42,7 +41,13 @@ import {
   MsgWithdrawValidatorCommissionDisplay,
   MsgInstantiateContractDisplay,
   MsgInstantiateContract2Display,
+  MsgRegisterFido2CredentialDisplay,
   ReadableMessageNames,
+  MsgRegisterCosmosCredentialDisplay,
+  MsgUpdateParamsDisplay,
+  MsgDeleteCredentialDisplay,
+  MsgDeleteAccountDisplay,
+  MsgMigrateToSmartAccountAuthenticationDisplay,
 } from '../../../types';
 import { Coin } from '../../../proto/cosmos/base/v1beta1/coin_pb';
 import { MsgSend } from '../../../proto/cosmos/bank/v1beta1/tx_pb';
@@ -54,6 +59,13 @@ import {
   MsgExec as MsgGroupExec,
 } from '../../../proto/cosmos/group/v1/tx_pb';
 import { MemberRequest } from '../../../proto/cosmos/group/v1/types_pb';
+import {
+  MsgDeleteAccount,
+  MsgDeleteCredential,
+  MsgMigrateToSmartAccountAuthentication,
+  MsgRegisterCosmosCredential,
+  MsgRegisterFido2Credential
+} from "../../../proto/provenance/smartaccounts/v1/tx_pb";
 const encoder = new TextEncoder();
 
 /**
@@ -74,7 +86,6 @@ export const buildMessage = (
     | MsgWithdrawDelegatorRewardDisplay
     | MsgWithdrawValidatorCommissionDisplay
     | MsgFundCommunityPoolDisplay
-    | MsgSubmitEvidenceDisplay
     | MsgSubmitProposalDisplay
     | MsgVoteDisplay
     | MsgVoteWeightedDisplay
@@ -101,7 +112,11 @@ export const buildMessage = (
     | MsgExecDisplay
     | MsgLeaveGroupDisplay
     | MsgInstantiateContractDisplay
-    | MsgInstantiateContract2Display
+    | MsgRegisterFido2CredentialDisplay
+    | MsgRegisterCosmosCredentialDisplay
+    | MsgUpdateParamsDisplay
+    | MsgDeleteCredentialDisplay
+    | MsgDeleteAccountDisplay
 ) => {
   switch (type) {
     case 'MsgDelegate': {
@@ -234,5 +249,57 @@ export const buildMessage = (
         });
       return msgExecuteContract;
     }
+    case 'MsgRegisterFido2Credential': {
+      const { sender, userIdentifier, encodedattestation } =
+          params as MsgRegisterFido2CredentialDisplay;
+      const msgRegisterFido2Credential = new MsgRegisterFido2Credential()
+          .setSender(sender)
+          .setUserIdentifier(userIdentifier)
+          .setEncodedattestation(encodedattestation);
+      return msgRegisterFido2Credential;
+    }
+
+    case 'MsgRegisterCosmosCredential': {
+      const { sender, pubkey } =
+          params as MsgRegisterCosmosCredentialDisplay;
+      const msgRegisterCosmosCredential = new MsgRegisterCosmosCredential()
+      if (pubkey) {
+        msgRegisterCosmosCredential.setPubkey(
+            new google_protobuf_any_pb.Any()
+                .setTypeUrl(pubkey.typeUrl)
+                .setValue(pubkey.value)
+        );
+      } else {
+        throw new Error("Pubkey is undefined");
+      }
+      return msgRegisterCosmosCredential;
+    }
+
+    case 'MsgMigrateToSmartAccountAuthentication': {
+      const { sender } =
+          params as MsgMigrateToSmartAccountAuthenticationDisplay;
+      const msgMigrateToSmartAccountAuthentication =
+          new MsgMigrateToSmartAccountAuthentication()
+              .setSender(sender);
+      return msgMigrateToSmartAccountAuthentication;
+    }
+
+    case 'MsgDeleteCredential': {
+      const { sender, credentialNumber } = params as MsgDeleteCredentialDisplay;
+      const msgDeleteCredential = new MsgDeleteCredential()
+        .setSender(sender)
+        .setCredentialNumber(credentialNumber);
+          
+      return msgDeleteCredential;
+    }
+
+    case 'MsgDeleteAccount': {
+      const { sender, address } = params as MsgDeleteAccountDisplay;
+      const msgDeleteAccount = new MsgDeleteAccount()
+          .setSender(sender)
+          .setAddress(address);
+      return msgDeleteAccount;
+    }
+
   }
 };

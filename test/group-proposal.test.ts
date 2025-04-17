@@ -58,6 +58,8 @@ describe(`test build group proposal`, () => {
         msgSendAny.pack(msgSend.serializeBinary(), TYPE_NAMES_READABLE_MAP.MsgSend, "/");
 
         const groupProposal = {
+            title: "kick ass title",
+            summary: "kick ass summary",
             groupPolicyAddress: grp,
             proposersList: [proposer],
             metadata: "kick ass proposal",

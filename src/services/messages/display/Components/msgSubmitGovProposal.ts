@@ -15,7 +15,7 @@ import {
 import {
   InstantiateContractProposal,
   StoreCodeProposal,
-} from '../../../../proto/cosmwasm/wasm/v1/proposal_pb';
+} from '../../../../proto/cosmwasm/wasm/v1/proposal_legacy_pb';
 import { ParameterChangeProposal } from '../../../../proto/cosmos/params/v1beta1/params_pb';
 import { cancelSoftwareUpgradeProposal } from './cancelSoftwareUpgradeProposal';
 import { instantiateCodeProposal } from './instantiateCodeProposal';
@@ -39,9 +39,9 @@ export const msgSubmitGovProposal = (message: MsgSubmitProposal) => {
     initialDepositList:
       depositList.length > 0
         ? depositList.map((coin) => ({
-            denom: coin.getDenom(),
-            amount: coin.getAmount(),
-          }))
+          denom: coin.getDenom(),
+          amount: coin.getAmount(),
+        }))
         : { denom: 'nhash', amount: '0' },
     messages: messagesList.map((msg) => {
       const typeName = msg.getTypeName() as SupportedMessageTypeNames;
