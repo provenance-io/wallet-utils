@@ -7,7 +7,7 @@ echo "Starting protoc gRPC generator"
 set -eo pipefail
 
 echo "Ensuring directory structure"
-mkdir -p third_party/proto third_party/build third_party/schema src/proto
+mkdir -p third_party/proto third_party/build third_party/schema src/proto src/ts-proto
 
 echo "Cleaning build"
 rm -rf third_party/build/*
@@ -38,3 +38,23 @@ echo "Cleaning build"
 rm -rf third_party/build/*
 
 echo "Process has completed"
+
+echo "Generate cosmos kit web compliant protos"
+proto_dirs=$(find ./third_party/proto -path -prune -o -name '*.proto' -print0 | xargs -0 -n1 dirname | sort | uniq)
+for dir in $proto_dirs; do
+  protoc \
+  -I "third_party/proto" \
+  --plugin=protoc-gen-ts_proto=./node_modules/.bin/protoc-gen-ts_proto \
+  --ts_proto_out=third_party/build \
+  --ts_proto_opt=esModuleInterop=true,forceLong=long,useOptionals='messages' \
+  $(find "${dir}" -maxdepth 1 -name '*.proto')
+done
+
+rm -rf ./src/ts-proto/*
+cp -r ./third_party/build/* ./src/ts-proto/.
+
+echo "Cleaning build"
+rm -rf third_party/build/*
+
+
+

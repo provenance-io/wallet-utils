@@ -89,6 +89,7 @@
     "regenerator-runtime": "^0.13.11",
     "semantic-release": "^19.0.2",
     "ts-jest": "^29.0.5",
+    "ts-proto": "^2.7.0",
     "typedoc": "^0.22.15",
     "typescript": "^4.6.4"
   },
